@@ -30,7 +30,7 @@ export default function AdminStaffPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [roleId, setRoleId] = useState("2");
+  const [roleId, setRoleId] = useState("3");
   const [yearsOfExperience, setYearsOfExperience] = useState(1);
   const [bio, setBio] = useState("");
   const [facebookUrl, setFacebookUrl] = useState("");
@@ -84,7 +84,7 @@ export default function AdminStaffPage() {
   const handleOpenCreate = () => {
     setEditingStaff(null);
     setUsername(""); setPassword(""); setFullName(""); setEmail(""); setPhone("");
-    setRoleId("2"); setYearsOfExperience(1); setBio("");
+    setRoleId("3"); setYearsOfExperience(1); setBio("");
     setFacebookUrl(""); setInstagramUrl("");
     setAvatarFile(null); setAvatarPreview("");
     setErrorMsg(""); setSuccessMsg("");
@@ -99,7 +99,7 @@ export default function AdminStaffPage() {
     setFullName(member.fullName || "");
     setEmail(member.email || "");
     setPhone(member.phone || "");
-    setRoleId(member.roleName === "PHOTOGRAPHER" ? "2" : "3");
+    setRoleId(member.roleName === "PHOTOGRAPHER" ? "3" : "2");
     setYearsOfExperience(member.yearsOfExperience || 1);
     setBio(member.bio || "");
     setFacebookUrl(member.facebookUrl || "");
@@ -457,8 +457,8 @@ export default function AdminStaffPage() {
                 <label className={labelCls}>Vai trò chuyên môn *</label>
                 <select value={roleId} disabled={submitLoading} onChange={(e) => setRoleId(e.target.value)}
                   className={inputCls}>
-                  <option value="2">Nhiếp ảnh gia (PHOTOGRAPHER)</option>
-                  <option value="3">Thợ trang điểm (MAKEUP ARTIST)</option>
+                  <option value="3">Nhiếp ảnh gia (PHOTOGRAPHER)</option>
+                  <option value="2">Thợ trang điểm (MAKEUP ARTIST)</option>
                 </select>
               </div>
 
