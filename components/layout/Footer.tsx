@@ -31,6 +31,8 @@ export default function Footer() {
   const facebookUrl = info?.facebookUrl || "https://www.facebook.com/leonstudio.concept/";
   const zaloUrl = info?.zaloUrl || "https://zalo.me/nicstudio";
   const youtubeUrl = info?.youtubeUrl || "https://youtube.com/nicstudio";
+  const instagramUrl = info?.instagramUrl || "https://www.instagram.com/leonstudio.concept/";
+  const tiktokUrl = info?.tiktokUrl || "https://www.tiktok.com/@leonstudio.concept";
 
   const splitName = studioName.split(" ");
   const firstWord = splitName[0] || "LEON";
@@ -108,6 +110,32 @@ export default function Footer() {
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
                     videocam
+                  </span>
+                </a>
+              )}
+              {instagramUrl && (
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:border-gold-luxury hover:text-gold-luxury transition-all duration-300"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                    photo_camera
+                  </span>
+                </a>
+              )}
+              {tiktokUrl && (
+                <a
+                  href={tiktokUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                  className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/60 hover:border-gold-luxury hover:text-gold-luxury transition-all duration-300"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                    music_note
                   </span>
                 </a>
               )}

@@ -17,6 +17,8 @@ export default function AdminStudioInfoPage() {
   const [facebookUrl, setFacebookUrl] = useState("");
   const [zaloUrl, setZaloUrl] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [tiktokUrl, setTiktokUrl] = useState("");
   const [introVideoUrl, setIntroVideoUrl] = useState("");
   const [introduction, setIntroduction] = useState("");
   const [workingProcess, setWorkingProcess] = useState("");
@@ -49,6 +51,8 @@ export default function AdminStudioInfoPage() {
           setFacebookUrl(data.facebookUrl || "");
           setZaloUrl(data.zaloUrl || "");
           setYoutubeUrl(data.youtubeUrl || "");
+          setInstagramUrl(data.instagramUrl || "");
+          setTiktokUrl(data.tiktokUrl || "");
           setIntroVideoUrl(data.introVideoUrl || "");
           setIntroduction(data.introduction || "");
           setWorkingProcess(data.workingProcess || "");
@@ -133,6 +137,8 @@ export default function AdminStudioInfoPage() {
       facebookUrl: facebookUrl || null,
       zaloUrl: zaloUrl || null,
       youtubeUrl: youtubeUrl || null,
+      instagramUrl: instagramUrl || null,
+      tiktokUrl: tiktokUrl || null,
       introVideoUrl: introVideoUrl || null,
       introduction,
       workingProcess,
@@ -338,6 +344,28 @@ export default function AdminStudioInfoPage() {
                   placeholder="https://youtube.com/..."
                   value={youtubeUrl}
                   onChange={(e) => setYoutubeUrl(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-850 text-zinc-200 px-3 py-2.5 rounded-lg outline-none focus:border-gold-luxury"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Đường dẫn Instagram Profile</label>
+                <input
+                  type="url"
+                  placeholder="https://instagram.com/..."
+                  value={instagramUrl}
+                  onChange={(e) => setInstagramUrl(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-850 text-zinc-200 px-3 py-2.5 rounded-lg outline-none focus:border-gold-luxury"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Đường dẫn TikTok Profile</label>
+                <input
+                  type="url"
+                  placeholder="https://tiktok.com/@..."
+                  value={tiktokUrl}
+                  onChange={(e) => setTiktokUrl(e.target.value)}
                   className="w-full bg-zinc-950 border border-zinc-850 text-zinc-200 px-3 py-2.5 rounded-lg outline-none focus:border-gold-luxury"
                 />
               </div>

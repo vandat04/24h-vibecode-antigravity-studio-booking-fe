@@ -14,6 +14,8 @@ export interface StudioInfo {
   facebookUrl?: string;
   zaloUrl?: string;
   youtubeUrl?: string;
+  instagramUrl?: string;
+  tiktokUrl?: string;
   introVideoUrl?: string;
   introduction?: string;
   workingProcess?: string;
