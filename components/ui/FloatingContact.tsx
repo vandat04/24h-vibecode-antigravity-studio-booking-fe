@@ -19,7 +19,6 @@ export default function FloatingContact() {
   const facebookUrl = info?.facebookUrl || "https://www.facebook.com/leonstudio.concept/";
   const instagramUrl = info?.instagramUrl || "https://www.instagram.com/leonstudio.concept/";
   const tiktokUrl = info?.tiktokUrl || "https://www.tiktok.com/@leonstudio.concept";
-  const googleMapUrl = info?.googleMapUrl || "https://maps.app.goo.gl/V3r96TqNmzWtAJqF8";
 
   return (
     <div
@@ -120,24 +119,6 @@ export default function FloatingContact() {
         {/* Tooltip */}
         <span className="absolute right-16 bg-black/85 backdrop-blur-sm text-white font-hanken text-xs py-1.5 px-3 rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none mr-1 select-none">
           TikTok
-        </span>
-      </a>
-
-      {/* 6. Google Maps Button (Green with white Location Pin icon) */}
-      <a
-        href={googleMapUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group relative w-13 h-13 rounded-full bg-[#2ecc71] text-white flex items-center justify-center shadow-lg hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300"
-        aria-label="Xem bản đồ chỉ đường"
-      >
-        <span className="material-symbols-outlined relative z-10 select-none" style={{ fontSize: 24 }}>
-          location_on
-        </span>
-
-        {/* Tooltip */}
-        <span className="absolute right-16 bg-black/85 backdrop-blur-sm text-white font-hanken text-xs py-1.5 px-3 rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none mr-1 select-none">
-          Chỉ đường (Google Maps)
         </span>
       </a>
     </div>
