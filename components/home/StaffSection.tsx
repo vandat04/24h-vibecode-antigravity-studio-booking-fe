@@ -49,7 +49,7 @@ const FALLBACK_STAFF: StaffMember[] = [
 
 const TABS: { label: string; value: string }[] = [
   { label: "Tất cả", value: "" },
-  { label: "Nhiếp ảnh gia", value: "PHOTOGRAPHER" },
+  { label: "Photographer", value: "PHOTOGRAPHER" },
   { label: "Makeup Artist", value: "MAKEUP" },
 ];
 
@@ -100,16 +100,13 @@ export default function StaffSection() {
       <div className="container-max px-page">
         {/* Header */}
         <div className="text-center mb-12">
-          <p className="fade-up font-hanken text-label-sm text-secondary uppercase tracking-widest mb-3">
-            Đội ngũ
-          </p>
           <h2
             id="team-heading"
-            className="fade-up font-playfair text-headline-lg md:text-display-lg text-on-surface mb-4"
+            className="fade-up font-playfair text-2xl md:text-3xl lg:text-4xl text-zinc-900 font-extrabold uppercase tracking-tight mb-3"
           >
-            Ê-kíp Sáng Tạo
+            Gặp Gỡ Đội Ngũ Của Chúng Tôi
           </h2>
-          <p className="fade-up font-hanken text-body-md text-on-surface-variant max-w-xl mx-auto">
+          <p className="fade-up font-hanken text-body-md text-on-surface-variant max-w-none mx-auto">
             Gặp gỡ những bàn tay nghệ thuật đứng sau các khung hình đẳng cấp tại LEON STUDIO
           </p>
         </div>

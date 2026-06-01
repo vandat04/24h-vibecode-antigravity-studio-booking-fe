@@ -109,14 +109,11 @@ export default function ServicesSection() {
       <div className="container-max px-page">
         {/* Header */}
         <div className="text-center mb-16">
-          <p className="fade-up font-hanken text-label-sm text-secondary uppercase tracking-widest mb-3">
-            Dịch vụ
-          </p>
           <h2
             id="services-heading"
-            className="fade-up font-playfair text-headline-lg md:text-display-lg text-on-surface mb-4"
+            className="fade-up font-playfair text-2xl md:text-3xl lg:text-4xl text-zinc-900 font-extrabold uppercase tracking-tight mb-3"
           >
-            Gói dịch vụ
+            Dịch vụ & Gói chụp
           </h2>
           <p className="fade-up font-hanken text-body-md text-on-surface-variant max-w-xl mx-auto">
             Lựa chọn gói dịch vụ phù hợp với nhu cầu và ngân sách của bạn

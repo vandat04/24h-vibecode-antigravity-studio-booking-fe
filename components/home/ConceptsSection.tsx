@@ -21,7 +21,6 @@ const CATEGORIES: { label: string; value: string }[] = [
   { label: "Sinh nhật", value: "BIRTHDAY" },
   { label: "Gia đình", value: "FAMILY" },
   { label: "Ngoại cảnh", value: "OUTDOOR" },
-  { label: "Sự kiện", value: "EVENT" },
 ];
 
 export default function ConceptsSection() {
@@ -71,16 +70,13 @@ export default function ConceptsSection() {
       <div className="container-max px-page">
         {/* Header */}
         <div className="text-center mb-12">
-          <p className="fade-up font-hanken text-label-sm text-secondary uppercase tracking-widest mb-3">
-            Portfolio
-          </p>
           <h2
             id="concepts-heading"
-            className="fade-up font-playfair text-headline-lg md:text-display-lg text-on-surface mb-4"
+            className="fade-up font-playfair text-2xl md:text-3xl lg:text-4xl text-zinc-900 font-extrabold uppercase tracking-tight mb-3"
           >
-            Concept & Phong cách
+            Bộ Sưu Tập Tác Phẩm
           </h2>
-          <p className="fade-up font-hanken text-body-md text-on-surface-variant max-w-xl mx-auto">
+          <p className="fade-up font-hanken text-body-md text-on-surface-variant max-w-none mx-auto">
             Khám phá đa dạng phong cách chụp ảnh để tìm concept phù hợp với cá tính của bạn
           </p>
         </div>

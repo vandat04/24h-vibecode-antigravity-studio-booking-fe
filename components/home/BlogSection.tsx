@@ -143,25 +143,13 @@ export default function BlogSection() {
     >
       <div className="container-max px-page">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-          <div>
-            <p className="fade-up font-hanken text-label-sm text-secondary uppercase tracking-widest mb-3">
-              Blog
-            </p>
-            <h2
-              id="blog-heading"
-              className="fade-up font-playfair text-headline-lg md:text-display-lg text-on-surface"
-            >
-              Kiến thức &amp; Cảm hứng
-            </h2>
-          </div>
-          <Link
-            href="/#blog"
-            className="fade-up flex items-center gap-2 font-hanken text-sm text-secondary hover:text-gold-dark font-medium transition-colors"
+        <div className="text-center mb-12">
+          <h2
+            id="blog-heading"
+            className="fade-up font-playfair text-2xl md:text-3xl lg:text-4xl text-zinc-900 font-extrabold uppercase tracking-tight"
           >
-            Xem tất cả
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_forward</span>
-          </Link>
+            Blog &amp; Cảm Hứng
+          </h2>
         </div>
 
         {/* Cards */}

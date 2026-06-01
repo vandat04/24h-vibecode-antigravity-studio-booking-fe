@@ -77,34 +77,20 @@ export default function HeroSection() {
         {/* Headline */}
         <h1
           ref={headlineRef}
-          className="fade-up font-playfair text-display-lg-mobile md:text-display-lg text-white mb-6 max-w-3xl leading-tight"
+          className="fade-up font-playfair text-2xl sm:text-4xl md:text-6xl lg:text-7xl text-white mb-6 max-w-none leading-tight font-extrabold uppercase tracking-tight"
           style={{ transition: "all 1s cubic-bezier(0.77, 0, 0.175, 1)" }}
         >
-          Nâng tầm{" "}
-          <span className="italic text-gold-luxury font-serif">vẻ đẹp</span>
-          <br className="hidden md:block" /> của bạn
+          Nâng tầm vẻ đẹp của bạn
         </h1>
 
-        {/* Subtext */}
-        <p className="fade-up visible font-hanken text-body-lg text-white/80 max-w-xl mb-10 leading-relaxed drop-shadow-md">
-          {introduction}
-        </p>
-
         {/* CTA Buttons */}
-        <div className="fade-up visible flex flex-col sm:flex-row gap-4 items-center">
+        <div className="fade-up visible flex justify-center">
           <Link
             href="/#booking"
             id="hero-booking-cta"
-            className="bg-gold-luxury hover:bg-gold-dark text-black font-hanken font-semibold text-sm uppercase tracking-widest px-10 py-4 transition-all duration-300 active:scale-95 hover:shadow-xl"
+            className="bg-gold-luxury hover:bg-gold-dark text-black font-hanken font-semibold text-sm uppercase tracking-widest px-12 py-4 transition-all duration-300 active:scale-95 hover:shadow-xl"
           >
-            Đặt lịch ngay
-          </Link>
-          <Link
-            href="/#concepts"
-            id="hero-portfolio-cta"
-            className="border border-white/40 hover:border-white text-white font-hanken font-medium text-sm uppercase tracking-widest px-10 py-4 transition-all duration-300 hover:bg-white/10 backdrop-blur-sm"
-          >
-            Xem portfolio
+            Tư vấn gói chụp
           </Link>
         </div>
       </div>

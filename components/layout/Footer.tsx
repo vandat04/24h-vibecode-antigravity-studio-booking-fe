@@ -36,13 +36,32 @@ export default function Footer() {
   const firstWord = splitName[0] || "LEON";
   const restOfName = splitName.slice(1).join(" ") || "STUDIO";
 
+  const getMapSrc = () => {
+    if (info?.googleMapUrl) {
+      const url = info.googleMapUrl.trim();
+      // Phân tích cú pháp case-insensitive cho thẻ iframe và thuộc tính src
+      if (/iframe/i.test(url) && /src\s*=/i.test(url)) {
+        const match = url.match(/src\s*=\s*["']([^"']+)["']/i);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+      // Nếu lưu URL trực tiếp
+      if (url.startsWith("http")) {
+        return url;
+      }
+    }
+    // Fallback theo địa chỉ động
+    return `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+  };
+
   return (
     <footer className="bg-primary text-on-primary">
       {/* Top Section */}
       <div className="container-max px-page pt-16 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <div className="mb-4">
               <span className="font-playfair font-bold text-2xl tracking-widest uppercase text-white block">
                 {firstWord}
@@ -51,10 +70,6 @@ export default function Footer() {
                 {restOfName}
               </span>
             </div>
-            <p className="text-white/60 font-hanken text-sm leading-relaxed max-w-xs">
-              {info?.introduction ||
-                "Chúng tôi tin rằng mỗi khoảnh khắc đều xứng đáng được ghi lại bằng nghệ thuật. LEON STUDIO - Nơi vẻ đẹp được nâng tầm."}
-            </p>
             {/* Social */}
             <div className="flex gap-3 mt-6">
               {facebookUrl && (
@@ -130,16 +145,6 @@ export default function Footer() {
                 </span>
                 <span>
                   {address}
-                  {info?.googleMapUrl && (
-                    <a
-                      href={info.googleMapUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gold-luxury hover:underline text-xs block mt-1"
-                    >
-                      Xem trên bản đồ &rarr;
-                    </a>
-                  )}
                 </span>
               </li>
               <li className="flex items-center gap-2 text-white/60 font-hanken text-sm">
@@ -172,6 +177,26 @@ export default function Footer() {
                 </div>
               </li>
             </ul>
+          </div>
+
+          {/* Map Column */}
+          <div className="md:col-span-1">
+            <h3 className="font-hanken text-xs font-semibold uppercase tracking-widest text-white/40 mb-4">
+              Bản đồ
+            </h3>
+            <div className="w-full h-40 rounded-xl overflow-hidden border border-white/10 shadow-lg relative">
+              <iframe
+                key={getMapSrc()}
+                src={getMapSrc()}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen={false}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Google Maps Location"
+              />
+            </div>
           </div>
         </div>
       </div>
