@@ -149,9 +149,7 @@ export default function ServicesSection() {
               {displayedPackages.map((pkg, idx) => (
                 <article
                   key={pkg.id}
-                  className={`fade-up group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col ${
-                    idx === 1 ? "ring-2 ring-gold-luxury" : ""
-                  }`}
+                  className="fade-up group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col"
                 >
                   {/* Dynamic Image from Cloudinary/API */}
                   <div
@@ -171,11 +169,6 @@ export default function ServicesSection() {
                         <span className="material-symbols-outlined text-gray-400" style={{ fontSize: 48 }}>
                           photo_camera
                         </span>
-                      </div>
-                    )}
-                    {idx === 1 && (
-                      <div className="absolute top-3 right-3 bg-gold-luxury text-black font-hanken text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-sm shadow-md z-10">
-                        Phổ biến
                       </div>
                     )}
                   </div>
