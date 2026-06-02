@@ -45,6 +45,21 @@ export default function ServicesSection() {
   const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
+  // Pagination state for displaying only 4 packages at a time
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 4;
+  const totalPages = Math.ceil(packages.length / itemsPerPage);
+
+  const displayedPackages = packages.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
+  const nextPage = () => {
+    setCurrentPage((prev) => (prev + 1) % totalPages);
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+  };
+
   useEffect(() => {
     guestApi
       .getPackages()
@@ -70,7 +85,7 @@ export default function ServicesSection() {
     );
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
-  }, [loading]);
+  }, [loading, currentPage]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -128,84 +143,128 @@ export default function ServicesSection() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {packages.map((pkg, idx) => (
-              <article
-                key={pkg.id}
-                className={`fade-up group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col ${
-                  idx === 1 ? "ring-2 ring-gold-luxury" : ""
-                }`}
-              >
-                {/* Dynamic Image from Cloudinary/API */}
-                <div
-                  className="concept-placeholder h-48 relative overflow-hidden bg-gray-50 flex items-center justify-center"
-                  aria-hidden="true"
+          <>
+            {/* Grid of 4 Cards */}
+            <div className="fade-up grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {displayedPackages.map((pkg, idx) => (
+                <article
+                  key={pkg.id}
+                  className={`fade-up group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col ${
+                    idx === 1 ? "ring-2 ring-gold-luxury" : ""
+                  }`}
                 >
-                  {pkg.thumbnailUrl ? (
-                    <Image
-                      src={pkg.thumbnailUrl}
-                      alt={pkg.packageName}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center">
-                      <span className="material-symbols-outlined text-gray-400" style={{ fontSize: 48 }}>
-                        photo_camera
-                      </span>
-                    </div>
-                  )}
-                  {idx === 1 && (
-                    <div className="absolute top-3 right-3 bg-gold-luxury text-black font-hanken text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-sm shadow-md z-10">
-                      Phổ biến
-                    </div>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="font-playfair text-headline-md text-on-surface mb-2 font-bold truncate">
-                    {pkg.packageName}
-                  </h3>
-                  <p className="font-hanken text-body-sm text-on-surface-variant mb-4 flex-1 leading-relaxed line-clamp-3 text-sm">
-                    {pkg.shortDescription}
-                  </p>
-
-                  {/* Details: layout, outfit, photos, makeup */}
-                  <div className="flex flex-wrap gap-1.5 mb-5">
-                    <span className="flex items-center gap-1 font-hanken text-[11px] font-semibold text-on-surface-variant bg-surface-container-low px-2.5 py-1 rounded-full">
-                      <span className="material-symbols-outlined" style={{ fontSize: 13 }}>grid_view</span>
-                      {pkg.layoutCount} layout
-                    </span>
-                    <span className="flex items-center gap-1 font-hanken text-[11px] font-semibold text-on-surface-variant bg-surface-container-low px-2.5 py-1 rounded-full">
-                      <span className="material-symbols-outlined" style={{ fontSize: 13 }}>photo_library</span>
-                      {pkg.editedPhotos} ảnh
-                    </span>
-                    {pkg.makeupPersonCount > 0 && (
-                      <span className="flex items-center gap-1 font-hanken text-[11px] font-semibold text-secondary bg-secondary/10 px-2.5 py-1 rounded-full">
-                        <span className="material-symbols-outlined" style={{ fontSize: 13 }}>face_retouching_natural</span>
-                        Makeup
-                      </span>
+                  {/* Dynamic Image from Cloudinary/API */}
+                  <div
+                    className="concept-placeholder h-48 relative overflow-hidden bg-gray-50 flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    {pkg.thumbnailUrl ? (
+                      <Image
+                        src={pkg.thumbnailUrl}
+                        alt={pkg.packageName}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        <span className="material-symbols-outlined text-gray-400" style={{ fontSize: 48 }}>
+                          photo_camera
+                        </span>
+                      </div>
+                    )}
+                    {idx === 1 && (
+                      <div className="absolute top-3 right-3 bg-gold-luxury text-black font-hanken text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-sm shadow-md z-10">
+                        Phổ biến
+                      </div>
                     )}
                   </div>
 
-                  {/* Price & Modal CTA */}
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/10">
-                    <span className="font-playfair text-headline-sm text-secondary font-bold">
-                      {formatPrice(pkg.price)}
-                    </span>
-                    <button
-                      onClick={() => setSelectedPackage(pkg)}
-                      className="bg-primary hover:bg-secondary text-on-primary font-hanken text-xs font-semibold uppercase tracking-wider px-4 py-2.5 transition-colors duration-300 active:scale-95 shadow-sm"
-                    >
-                      Xem chi tiết
-                    </button>
+                  {/* Content */}
+                  <div className="p-6 flex flex-col flex-1">
+                    <h3 className="font-playfair text-headline-md text-on-surface mb-2 font-bold truncate">
+                      {pkg.packageName}
+                    </h3>
+                    <p className="font-hanken text-body-sm text-on-surface-variant mb-4 flex-1 leading-relaxed line-clamp-3 text-sm">
+                      {pkg.shortDescription}
+                    </p>
+
+                    {/* Details: layout, outfit, photos, makeup */}
+                    <div className="flex flex-wrap gap-1.5 mb-5">
+                      <span className="flex items-center gap-1 font-hanken text-[11px] font-semibold text-on-surface-variant bg-surface-container-low px-2.5 py-1 rounded-full">
+                        <span className="material-symbols-outlined" style={{ fontSize: 13 }}>grid_view</span>
+                        {pkg.layoutCount} layout
+                      </span>
+                      <span className="flex items-center gap-1 font-hanken text-[11px] font-semibold text-on-surface-variant bg-surface-container-low px-2.5 py-1 rounded-full">
+                        <span className="material-symbols-outlined" style={{ fontSize: 13 }}>photo_library</span>
+                        {pkg.editedPhotos} ảnh
+                      </span>
+                      {pkg.makeupPersonCount > 0 && (
+                        <span className="flex items-center gap-1 font-hanken text-[11px] font-semibold text-secondary bg-secondary/10 px-2.5 py-1 rounded-full">
+                          <span className="material-symbols-outlined" style={{ fontSize: 13 }}>face_retouching_natural</span>
+                          Makeup
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Price & Modal CTA */}
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/10">
+                      <span className="font-playfair text-headline-sm text-secondary font-bold">
+                        {formatPrice(pkg.price)}
+                      </span>
+                      <button
+                        onClick={() => setSelectedPackage(pkg)}
+                        className="bg-primary hover:bg-secondary text-on-primary font-hanken text-xs font-semibold uppercase tracking-wider px-4 py-2.5 transition-colors duration-300 active:scale-95 shadow-sm"
+                      >
+                        Xem chi tiết
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                </article>
+              ))}
+            </div>
+
+            {/* Pagination Controls centered below the grid on the same line */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-3 mt-12" role="tablist" aria-label="Services page navigation">
+                {/* Left Arrow Button */}
+                <button
+                  onClick={prevPage}
+                  className="w-8 h-8 rounded border border-outline-variant/30 bg-white flex items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary shadow-sm transition-all active:scale-95 cursor-pointer flex-shrink-0"
+                  aria-label="Previous page"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_left</span>
+                </button>
+
+                {/* Page Numbers */}
+                {[...Array(totalPages)].map((_, idx) => (
+                  <button
+                    key={idx}
+                    role="tab"
+                    aria-selected={currentPage === idx}
+                    aria-label={`Trang ${idx + 1}`}
+                    onClick={() => setCurrentPage(idx)}
+                    className={`w-8 h-8 rounded font-hanken text-xs font-bold transition-all flex items-center justify-center cursor-pointer ${
+                      currentPage === idx
+                        ? "bg-primary text-on-primary shadow-md"
+                        : "text-on-surface-variant/60 hover:text-primary hover:bg-outline-variant/10"
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+
+                {/* Right Arrow Button */}
+                <button
+                  onClick={nextPage}
+                  className="w-8 h-8 rounded border border-outline-variant/30 bg-white flex items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary shadow-sm transition-all active:scale-95 cursor-pointer flex-shrink-0"
+                  aria-label="Next page"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
