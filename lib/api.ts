@@ -70,7 +70,7 @@ export const guestApi = {
   // ── API 4: Danh sách gói dịch vụ ────────────────────────────────
   /** GET /api/studio/packages */
   getPackages: () =>
-    apiFetch<PackageSummary[]>("/api/studio/packages"),
+    apiFetch<PackageSummary[]>("/api/studio/packages?size=100"),
 
   // ── API 5: Chi tiết gói dịch vụ theo slug ───────────────────────
   /** GET /api/studio/packages/{slug} */
