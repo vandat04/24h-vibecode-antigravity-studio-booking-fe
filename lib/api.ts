@@ -79,8 +79,11 @@ export const guestApi = {
 
   // ── API 6: Đội ngũ nhân sự ───────────────────────────────────────
   /** GET /api/studio/staff?role=PHOTOGRAPHER (role tùy chọn) */
-  getStaff: (role?: "PHOTOGRAPHER" | "MAKEUP") =>
-    apiFetch<StaffMember[]>(`/api/studio/staff${role ? `?role=${role}` : ""}`),
+  getStaff: (role?: "PHOTOGRAPHER" | "MAKEUP" | "MEDIA" | "ADMIN") => {
+    const params = new URLSearchParams({ size: "100" });
+    if (role) params.set("role", role);
+    return apiFetch<StaffMember[]>(`/api/studio/staff?${params.toString()}`);
+  },
 
   // ── API 7: Danh sách blog ────────────────────────────────────────
   /** GET /api/studio/blogs */

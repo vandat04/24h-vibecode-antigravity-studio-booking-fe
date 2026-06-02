@@ -74,7 +74,7 @@ export interface PackageDetail extends PackageSummary {
 }
 
 // ─── API 6: Staff Member ───────────────────────────────────────────
-export type StaffRole = "PHOTOGRAPHER" | "MAKEUP";
+export type StaffRole = "PHOTOGRAPHER" | "MAKEUP" | "MEDIA" | "ADMIN";
 
 export interface StaffMember {
   profileId: number;

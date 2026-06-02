@@ -7,8 +7,10 @@ const PAGE_SIZE = 10;
 
 const ROLE_OPTIONS = [
   { value: "", label: "Tất cả vai trò" },
+  { value: "ADMIN", label: "Studio Owner (ADMIN)" },
   { value: "PHOTOGRAPHER", label: "Nhiếp ảnh gia" },
   { value: "MAKEUP", label: "Makeup Artist" },
+  { value: "MEDIA", label: "Media / Editor" },
 ];
 
 export default function AdminStaffPage() {
@@ -99,7 +101,11 @@ export default function AdminStaffPage() {
     setFullName(member.fullName || "");
     setEmail(member.email || "");
     setPhone(member.phone || "");
-    setRoleId(member.roleName === "PHOTOGRAPHER" ? "3" : "2");
+    setRoleId(
+      member.roleName === "ADMIN" ? "1" :
+      member.roleName === "PHOTOGRAPHER" ? "3" :
+      member.roleName === "MAKEUP" ? "2" : "4"
+    );
     setYearsOfExperience(member.yearsOfExperience || 1);
     setBio(member.bio || "");
     setFacebookUrl(member.facebookUrl || "");
@@ -274,10 +280,14 @@ export default function AdminStaffPage() {
                       <div className="text-[10px] text-zinc-600 italic max-w-[160px] truncate">{member.bio || ""}</div>
                     </td>
                     <td className="py-3 px-4">
-                      {member.roleName === "PHOTOGRAPHER" ? (
+                      {member.roleName === "ADMIN" ? (
+                        <span className="px-2 py-0.5 rounded bg-amber-500/10 text-gold-luxury border border-amber-500/20 text-[9px] font-bold font-mono tracking-wide">STUDIO OWNER</span>
+                      ) : member.roleName === "PHOTOGRAPHER" ? (
                         <span className="px-2 py-0.5 rounded bg-blue-950/40 text-blue-400 border border-blue-900/40 text-[9px] font-bold font-mono tracking-wide">PHOTOGRAPHER</span>
                       ) : member.roleName === "MAKEUP" ? (
                         <span className="px-2 py-0.5 rounded bg-pink-950/40 text-pink-400 border border-pink-900/40 text-[9px] font-bold font-mono tracking-wide">MAKEUP</span>
+                      ) : member.roleName === "MEDIA" ? (
+                        <span className="px-2 py-0.5 rounded bg-amber-950/40 text-amber-400 border border-amber-900/40 text-[9px] font-bold font-mono tracking-wide">MEDIA</span>
                       ) : (
                         <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 text-[9px] font-bold font-mono">{member.roleName}</span>
                       )}
@@ -455,10 +465,12 @@ export default function AdminStaffPage() {
 
               <div>
                 <label className={labelCls}>Vai trò chuyên môn *</label>
-                <select value={roleId} disabled={submitLoading} onChange={(e) => setRoleId(e.target.value)}
+                <select value={roleId} disabled={submitLoading || editingStaff?.roleName === "ADMIN"} onChange={(e) => setRoleId(e.target.value)}
                   className={inputCls}>
+                  {editingStaff?.roleName === "ADMIN" && <option value="1">Studio Owner (ADMIN)</option>}
                   <option value="3">Nhiếp ảnh gia (PHOTOGRAPHER)</option>
                   <option value="2">Thợ trang điểm (MAKEUP ARTIST)</option>
+                  <option value="4">Chuyên viên Media (MEDIA)</option>
                 </select>
               </div>
 

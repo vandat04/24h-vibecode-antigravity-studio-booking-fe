@@ -7,6 +7,12 @@ import type { StaffMember } from "@/types";
 
 const FALLBACK_STAFF: StaffMember[] = [
   {
+    profileId: 7, userId: 1, fullName: "Nguyễn Minh Quân", roleName: "ADMIN",
+    avatarUrl: "https://res.cloudinary.com/do8uakd0l/image/upload/v1780213774/hai_m8zhf6.webp",
+    bio: "Sáng lập & Điều hành LEON STUDIO", experienceDetail: "Chỉ đạo nghệ thuật & Quản lý",
+    yearsOfExperience: 10, facebookUrl: "https://facebook.com/quan.leon", instagramUrl: "https://instagram.com/quan.leon"
+  },
+  {
     profileId: 1, userId: 2, fullName: "Trần Ngọc Linh", roleName: "MAKEUP",
     avatarUrl: "https://res.cloudinary.com/do8uakd0l/image/upload/v1780213775/linh_l6etep.jpg",
     bio: "Makeup Beauty chuyên nghiệp", experienceDetail: "Trang điểm beauty, kỷ yếu, couple",
@@ -45,12 +51,21 @@ const FALLBACK_STAFF: StaffMember[] = [
     bio: "Photographer", experienceDetail: "Beauty Studio",
     yearsOfExperience: 6, facebookUrl: "https://facebook.com/tuan", instagramUrl: "https://instagram.com/tuan"
   },
+  {
+    profileId: 8, userId: 8, fullName: "Phạm Quốc Huy", roleName: "MEDIA",
+    avatarUrl: "https://res.cloudinary.com/do8uakd0l/image/upload/v1780213775/tuan_au9z5m.jpg",
+    bio: "Chuyên viên dựng phim & Editor", experienceDetail: "Hậu kỳ Video & Storytelling",
+    yearsOfExperience: 6, facebookUrl: "https://facebook.com/huy.media", instagramUrl: "https://instagram.com/huy.media",
+    tiktokUrl: "https://tiktok.com/@huy.media"
+  },
 ];
 
 const TABS: { label: string; value: string }[] = [
   { label: "Tất cả", value: "" },
+  { label: "Studio Owner", value: "ADMIN" },
   { label: "Photographer", value: "PHOTOGRAPHER" },
   { label: "Makeup Artist", value: "MAKEUP" },
+  { label: "Media", value: "MEDIA" },
 ];
 
 export default function StaffSection() {
@@ -60,10 +75,31 @@ export default function StaffSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    console.log("StaffSection: Fetching staff from API...");
     guestApi
       .getStaff()
-      .then((data) => setStaff(data.length ? data : FALLBACK_STAFF))
-      .catch(() => setStaff(FALLBACK_STAFF))
+      .then((data) => {
+        console.log("StaffSection: API returned staff data:", data);
+        if (data && data.length) {
+          // Merge API data with FALLBACK_STAFF, avoiding duplicate roles
+          const merged = [...data];
+          const existingRoles = new Set(data.map((s) => s.roleName.toUpperCase()));
+          FALLBACK_STAFF.forEach((fallbackMember) => {
+            if (!existingRoles.has(fallbackMember.roleName.toUpperCase())) {
+              merged.push(fallbackMember);
+            }
+          });
+          console.log("StaffSection: Merged staff list to display:", merged);
+          setStaff(merged);
+        } else {
+          console.warn("StaffSection: API returned empty list, falling back to static data.");
+          setStaff(FALLBACK_STAFF);
+        }
+      })
+      .catch((err) => {
+        console.error("StaffSection: Failed to fetch staff from API, falling back to static data:", err);
+        setStaff(FALLBACK_STAFF);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -88,7 +124,7 @@ export default function StaffSection() {
   const filtered =
     activeTab === ""
       ? staff
-      : staff.filter((s) => s.roleName === activeTab);
+      : staff.filter((s) => s.roleName?.trim().toUpperCase() === activeTab.trim().toUpperCase());
 
   return (
     <section
@@ -168,7 +204,10 @@ export default function StaffSection() {
                 {/* Info Content */}
                 <div className="p-6 flex-1 flex flex-col">
                   <span className="font-hanken text-[11px] font-bold text-secondary uppercase tracking-widest mb-1.5 block">
-                    {member.roleName === "PHOTOGRAPHER" ? "Photographer" : "Makeup Artist"}
+                    {member.roleName?.trim().toUpperCase() === "ADMIN" && "Studio Owner"}
+                    {member.roleName?.trim().toUpperCase() === "PHOTOGRAPHER" && "Photographer"}
+                    {member.roleName?.trim().toUpperCase() === "MAKEUP" && "Makeup Artist"}
+                    {member.roleName?.trim().toUpperCase() === "MEDIA" && "Media / Editor"}
                   </span>
                   <h3 className="font-playfair text-headline-md text-on-surface mb-2 font-bold group-hover:text-secondary transition-colors">
                     {member.fullName}
