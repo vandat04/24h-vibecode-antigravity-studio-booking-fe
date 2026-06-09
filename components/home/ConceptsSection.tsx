@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { guestApi } from "@/lib/api";
-import type { ConceptSummary } from "@/types";
+import type { ConceptSummary, ConceptDetail } from "@/types";
 
 const FALLBACK_CONCEPTS: ConceptSummary[] = [
   { id: 1, title: "SWEET ANGEL", slug: "sweet-angel", conceptType: "BEAUTY", thumbnailUrl: "", description: "Sự nhẹ nhàng, tinh khôi", status: "PUBLISHED", createdAt: "" },
@@ -27,15 +27,39 @@ export default function ConceptsSection() {
   const [concepts, setConcepts] = useState<ConceptSummary[]>(FALLBACK_CONCEPTS);
   const [activeCategory, setActiveCategory] = useState("");
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+
+  const itemsPerPage = 15;
+
+  // Modal states for detailed concept view
+  const [selectedConcept, setSelectedConcept] = useState<ConceptDetail | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     guestApi
-      .getConcepts()
+      .getConcepts(undefined, 0, 1000)
       .then((data) => setConcepts(data.length ? data : FALLBACK_CONCEPTS))
       .catch(() => setConcepts(FALLBACK_CONCEPTS))
       .finally(() => setLoading(false));
   }, []);
+
+  // Reset page on category change
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [activeCategory]);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (selectedConcept) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedConcept]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -53,12 +77,53 @@ export default function ConceptsSection() {
     );
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
-  }, [loading, activeCategory]);
+  }, [loading, activeCategory, currentPage]);
+
+  const handleOpenModal = async (concept: ConceptSummary) => {
+    setModalLoading(true);
+    // Initialize modal with basic summary details
+    const tempDetail: ConceptDetail = {
+      ...concept,
+      images: [],
+      credits: []
+    };
+    setSelectedConcept(tempDetail);
+
+    try {
+      const detail = await guestApi.getConceptBySlug(concept.slug);
+      setSelectedConcept(detail);
+    } catch (err) {
+      console.warn("Failed to fetch concept details, falling back to summary information:", err);
+      setSelectedConcept({
+        ...concept,
+        images: concept.thumbnailUrl ? [{ id: 1, imageUrl: concept.thumbnailUrl, sortOrder: 0 }] : [],
+        credits: []
+      });
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const handleBookConcept = (conceptId: number) => {
+    setSelectedConcept(null);
+    window.dispatchEvent(
+      new CustomEvent("select-booking-concept", {
+        detail: { conceptId },
+      })
+    );
+    const bookingEl = document.getElementById("booking");
+    if (bookingEl) {
+      bookingEl.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const filtered =
     activeCategory === ""
       ? concepts
       : concepts.filter((c) => c.conceptType === activeCategory);
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const displayedConcepts = filtered.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
   return (
     <section
@@ -110,9 +175,10 @@ export default function ConceptsSection() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {filtered.map((concept) => (
+            {displayedConcepts.map((concept) => (
               <div
                 key={concept.id}
+                onClick={() => handleOpenModal(concept)}
                 className="fade-up group relative aspect-[4/5] w-full overflow-hidden cursor-pointer rounded-xl bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
               >
                 {/* Image or Placeholder */}
@@ -153,7 +219,47 @@ export default function ConceptsSection() {
           </div>
         )}
 
-        {/* View more */}
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-3 mt-12" role="navigation" aria-label="Concepts page navigation">
+            {/* Left Chevron Button */}
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+              disabled={currentPage === 0}
+              className="w-10 h-10 rounded-lg border border-outline-variant/30 bg-white flex items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary shadow-sm transition-all active:scale-95 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Previous page"
+            >
+              <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+            </button>
+
+            {/* Page Numbers */}
+            {[...Array(totalPages)].map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentPage(idx)}
+                className={`w-10 h-10 rounded-lg font-hanken text-xs font-bold transition-all flex items-center justify-center cursor-pointer ${
+                  currentPage === idx
+                    ? "bg-primary text-on-primary shadow-md"
+                    : "text-on-surface-variant/60 hover:text-primary hover:bg-outline-variant/10"
+                }`}
+              >
+                {idx + 1}
+              </button>
+            ))}
+
+            {/* Right Chevron Button */}
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))}
+              disabled={currentPage === totalPages - 1}
+              className="w-10 h-10 rounded-lg border border-outline-variant/30 bg-white flex items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary shadow-sm transition-all active:scale-95 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Next page"
+            >
+              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+          </div>
+        )}
+
+        {/* View more / CTA */}
         <div className="text-center mt-12">
           <a
             href="/#booking"
@@ -164,6 +270,94 @@ export default function ConceptsSection() {
           </a>
         </div>
       </div>
+
+      {/* ─── Concept Details Modal Popup ─── */}
+      {selectedConcept && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md transition-opacity duration-300 animate-fade-in"
+          onClick={() => setSelectedConcept(null)}
+          aria-modal="true"
+          role="dialog"
+        >
+          <div
+            className="relative w-full max-w-4xl max-h-[85vh] bg-white border border-zinc-200 rounded-2xl shadow-2xl overflow-y-auto flex flex-col animate-scale-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedConcept(null)}
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 flex items-center justify-center transition-colors cursor-pointer"
+              aria-label="Đóng cửa sổ"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+            </button>
+
+            {/* Modal Content */}
+            <div className="p-6 md:p-8 flex flex-col space-y-6">
+              {/* Concept Title & Description */}
+              <div>
+                <span className="font-hanken text-[10px] font-bold text-secondary uppercase tracking-widest mb-1.5 block font-mono">
+                  Concept: {selectedConcept.conceptType}
+                </span>
+                <h3 className="font-playfair text-display-md text-zinc-900 font-bold mb-3 leading-tight text-xl md:text-2xl">
+                  {selectedConcept.title}
+                </h3>
+                {selectedConcept.description && (
+                  <p className="font-hanken text-zinc-600 text-sm leading-relaxed max-w-2xl">
+                    {selectedConcept.description}
+                  </p>
+                )}
+              </div>
+
+              {/* Photos Gallery */}
+              <div className="border-t border-zinc-100 pt-4 flex-1">
+                <h4 className="font-playfair text-zinc-900 text-xs font-bold uppercase tracking-wider mb-3 font-mono">
+                  Hình ảnh Concept
+                </h4>
+                {modalLoading ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 min-h-[200px]">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="skeleton rounded-xl aspect-[3/4]" />
+                    ))}
+                  </div>
+                ) : selectedConcept.images && selectedConcept.images.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[40vh] overflow-y-auto pr-1 custom-scrollbar">
+                    {selectedConcept.images.map((img) => (
+                      <div
+                        key={img.id}
+                        className="relative aspect-[3/4] rounded-xl overflow-hidden bg-zinc-100 group"
+                      >
+                        <Image
+                          src={img.imageUrl}
+                          alt={`${selectedConcept.title} gallery`}
+                          fill
+                          sizes="(max-width: 768px) 50vw, 33vw"
+                          className="object-cover transition-transform duration-500 hover:scale-105"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-zinc-50 border border-zinc-100/50 p-8 rounded-xl text-center text-zinc-400 italic text-xs font-hanken py-10">
+                    Chưa có ảnh mô tả bổ sung cho concept này.
+                  </div>
+                )}
+              </div>
+
+              {/* CTA Booking Button */}
+              <div className="border-t border-zinc-100 pt-5 flex justify-end">
+                <button
+                  onClick={() => handleBookConcept(selectedConcept.id)}
+                  className="bg-gold-luxury hover:bg-amber-500 text-black font-hanken text-xs font-semibold uppercase tracking-widest px-8 py-3.5 rounded transition-all duration-300 active:scale-95 shadow-md flex items-center justify-center gap-2 cursor-pointer font-sans"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>calendar_month</span>
+                  Đặt lịch với concept này
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

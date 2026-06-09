@@ -42,9 +42,11 @@ export default function BrandStorySection() {
             Câu chuyện thương hiệu
           </h3>
 
-          <p className="font-hanken text-body-lg text-zinc-700 leading-relaxed text-center max-w-3xl mx-auto">
-            {introduction}
-          </p>
+          <div className="max-w-3xl mx-auto max-h-[520px] overflow-y-auto pr-4 custom-scrollbar">
+            <p className="font-hanken text-body-lg text-zinc-700 leading-relaxed text-justify">
+              {introduction}
+            </p>
+          </div>
         </div>
       </div>
     </section>

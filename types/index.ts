@@ -66,6 +66,8 @@ export interface PackageSummary {
   makeupPersonCount: number;
   thumbnailUrl: string;
   isActive: boolean;
+  serviceTypeId?: number;
+  serviceTypeName?: string;
 }
 
 // ─── API 5: Package Detail ─────────────────────────────────────────
@@ -252,4 +254,9 @@ export type Testimonial = CustomerStory & {
 export interface NavLink {
   label: string;
   href: string;
+}
+
+export interface ServiceType {
+  id: number;
+  serviceName: string;
 }

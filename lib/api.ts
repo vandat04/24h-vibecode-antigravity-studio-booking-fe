@@ -45,6 +45,7 @@ import type {
   BookingLookupResponse,
   LoginRequest,
   LoginResponse,
+  ServiceType,
 } from "@/types";
 
 // ═══════════════════════════════════════════════════════════════════
@@ -59,8 +60,14 @@ export const guestApi = {
 
   // ── API 2: Danh sách concept ─────────────────────────────────────
   /** GET /api/studio/concepts?type=BEAUTY (type tùy chọn) */
-  getConcepts: (type?: string) =>
-    apiFetch<ConceptSummary[]>(`/api/studio/concepts${type ? `?type=${type}` : ""}`),
+  getConcepts: (type?: string, page?: number, size?: number) => {
+    const params = new URLSearchParams();
+    if (type) params.set("type", type);
+    if (page !== undefined) params.set("page", String(page));
+    if (size !== undefined) params.set("size", String(size));
+    const query = params.toString();
+    return apiFetch<ConceptSummary[]>(`/api/studio/concepts${query ? `?${query}` : ""}`);
+  },
 
   // ── API 3: Chi tiết concept theo slug ────────────────────────────
   /** GET /api/studio/concepts/{slug} */
@@ -69,13 +76,19 @@ export const guestApi = {
 
   // ── API 4: Danh sách gói dịch vụ ────────────────────────────────
   /** GET /api/studio/packages */
-  getPackages: () =>
-    apiFetch<PackageSummary[]>("/api/studio/packages?size=100"),
+  getPackages: (serviceTypeId?: number) => {
+    const params = new URLSearchParams({ size: "100" });
+    if (serviceTypeId) params.set("serviceTypeId", String(serviceTypeId));
+    return apiFetch<PackageSummary[]>(`/api/studio/packages?${params.toString()}`);
+  },
 
   // ── API 5: Chi tiết gói dịch vụ theo slug ───────────────────────
   /** GET /api/studio/packages/{slug} */
   getPackageBySlug: (slug: string) =>
     apiFetch<PackageDetail>(`/api/studio/packages/${slug}`),
+
+  getServiceTypes: () =>
+    apiFetch<ServiceType[]>("/api/studio/service-types"),
 
   // ── API 6: Đội ngũ nhân sự ───────────────────────────────────────
   /** GET /api/studio/staff?role=PHOTOGRAPHER (role tùy chọn) */

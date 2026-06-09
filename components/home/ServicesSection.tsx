@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { guestApi } from "@/lib/api";
-import type { PackageSummary } from "@/types";
+import type { PackageSummary, ServiceType } from "@/types";
 
 const FALLBACK_PACKAGES: PackageSummary[] = [
   {
@@ -32,6 +32,20 @@ const FALLBACK_PACKAGES: PackageSummary[] = [
   },
 ];
 
+const TYPE_ORDER: Record<string, number> = {
+  "STANDARD": 1,
+  "PREMIUM": 2,
+  "VIP": 3
+};
+
+const getServiceTypeWeight = (name: string): number => {
+  const normalized = (name || "").trim().toUpperCase();
+  if (normalized.includes("STANDARD")) return TYPE_ORDER.STANDARD;
+  if (normalized.includes("PREMIUM")) return TYPE_ORDER.PREMIUM;
+  if (normalized.includes("VIP")) return TYPE_ORDER.VIP;
+  return 99;
+};
+
 function formatPrice(price: number) {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -41,6 +55,8 @@ function formatPrice(price: number) {
 
 export default function ServicesSection() {
   const [packages, setPackages] = useState<PackageSummary[]>(FALLBACK_PACKAGES);
+  const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([]);
+  const [activeTypeId, setActiveTypeId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
@@ -60,13 +76,36 @@ export default function ServicesSection() {
     setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
   };
 
+  // Load service types on mount
   useEffect(() => {
     guestApi
-      .getPackages()
-      .then((data) => setPackages(data.length ? data : FALLBACK_PACKAGES))
-      .catch(() => setPackages(FALLBACK_PACKAGES))
-      .finally(() => setLoading(false));
+      .getServiceTypes()
+      .then((types) => {
+        const sortedTypes = [...types].sort((a, b) => {
+          const weightA = getServiceTypeWeight(a.serviceName);
+          const weightB = getServiceTypeWeight(b.serviceName);
+          return weightA - weightB;
+        });
+        setServiceTypes(sortedTypes);
+      })
+      .catch((err) => console.warn("Failed to load service types:", err));
   }, []);
+
+  // Load packages whenever activeTypeId changes
+  useEffect(() => {
+    setLoading(true);
+    guestApi
+      .getPackages(activeTypeId ?? undefined)
+      .then((data) => {
+        setPackages(data.length ? data : (activeTypeId ? [] : FALLBACK_PACKAGES));
+        setCurrentPage(0); // Reset page on category change
+      })
+      .catch(() => {
+        setPackages(activeTypeId ? [] : FALLBACK_PACKAGES);
+        setCurrentPage(0);
+      })
+      .finally(() => setLoading(false));
+  }, [activeTypeId]);
 
   // Intersection observer for fade-up (trình tự animate khi loading chuyển sang false)
   useEffect(() => {
@@ -134,6 +173,35 @@ export default function ServicesSection() {
             Lựa chọn gói dịch vụ phù hợp với nhu cầu và ngân sách của bạn
           </p>
         </div>
+
+        {/* Category Filter */}
+        {serviceTypes.length > 0 && (
+          <div className="fade-up flex flex-wrap gap-2 justify-center mb-12">
+            <button
+              onClick={() => setActiveTypeId(null)}
+              className={`font-hanken text-[10px] font-bold uppercase tracking-widest px-5 py-2.5 border transition-all duration-200 cursor-pointer ${
+                activeTypeId === null
+                  ? "bg-primary border-primary text-on-primary"
+                  : "border-outline/30 text-on-surface-variant hover:border-primary hover:text-on-surface"
+              }`}
+            >
+              Tất cả
+            </button>
+            {serviceTypes.map((type) => (
+              <button
+                key={type.id}
+                onClick={() => setActiveTypeId(type.id)}
+                className={`font-hanken text-[10px] font-bold uppercase tracking-widest px-5 py-2.5 border transition-all duration-200 cursor-pointer ${
+                  activeTypeId === type.id
+                    ? "bg-primary border-primary text-on-primary"
+                    : "border-outline/30 text-on-surface-variant hover:border-primary hover:text-on-surface"
+                }`}
+              >
+                {type.serviceName}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Grid */}
         {loading ? (

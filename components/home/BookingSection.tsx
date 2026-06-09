@@ -150,8 +150,18 @@ export default function BookingSection() {
         setForm((prev) => ({ ...prev, packageId: customEvent.detail.packageId }));
       }
     };
+    const handleSelectConcept = (e: Event) => {
+      const customEvent = e as CustomEvent<{ conceptId: number }>;
+      if (customEvent.detail?.conceptId) {
+        setForm((prev) => ({ ...prev, conceptId: customEvent.detail.conceptId }));
+      }
+    };
     window.addEventListener("select-booking-package", handleSelectPackage);
-    return () => window.removeEventListener("select-booking-package", handleSelectPackage);
+    window.addEventListener("select-booking-concept", handleSelectConcept);
+    return () => {
+      window.removeEventListener("select-booking-package", handleSelectPackage);
+      window.removeEventListener("select-booking-concept", handleSelectConcept);
+    };
   }, []);
 
   // ─── Load time slots khi date hoặc package/concept thay đổi ──────

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { adminApi } from "@/lib/api";
+import { adminApi, guestApi } from "@/lib/api";
 
 export default function AdminPackagesPage() {
   const [packages, setPackages] = useState<any[]>([]);
@@ -26,6 +26,8 @@ export default function AdminPackagesPage() {
   const [makeupPersonCount, setMakeupPersonCount] = useState(1);
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [isActive, setIsActive] = useState(true);
+  const [serviceTypes, setServiceTypes] = useState<any[]>([]);
+  const [serviceTypeId, setServiceTypeId] = useState<number | string>("");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -62,6 +64,25 @@ export default function AdminPackagesPage() {
     fetchPackages();
   }, [page]);
 
+  useEffect(() => {
+    const TYPE_ORDER: Record<string, number> = { "STANDARD": 1, "PREMIUM": 2, "VIP": 3 };
+    const getWeight = (name: string): number => {
+      const normalized = (name || "").trim().toUpperCase();
+      if (normalized.includes("STANDARD")) return TYPE_ORDER.STANDARD;
+      if (normalized.includes("PREMIUM")) return TYPE_ORDER.PREMIUM;
+      if (normalized.includes("VIP")) return TYPE_ORDER.VIP;
+      return 99;
+    };
+
+    guestApi
+      .getServiceTypes()
+      .then((types) => {
+        const sorted = [...types].sort((a, b) => getWeight(a.serviceName) - getWeight(b.serviceName));
+        setServiceTypes(sorted);
+      })
+      .catch((err) => console.error("Lỗi lấy danh sách Service Types:", err));
+  }, []);
+
   const handleOpenCreate = () => {
     setEditingPkg(null);
     setPackageName("");
@@ -74,6 +95,7 @@ export default function AdminPackagesPage() {
     setMakeupPersonCount(1);
     setThumbnailUrl("");
     setIsActive(true);
+    setServiceTypeId("");
     setErrorMsg("");
     setSuccessMsg("");
     setIsFormOpen(true);
@@ -98,6 +120,7 @@ export default function AdminPackagesPage() {
         setMakeupPersonCount(detail.makeupPersonCount || 1);
         setThumbnailUrl(detail.thumbnailUrl || "");
         setIsActive(detail.isActive);
+        setServiceTypeId(detail.serviceTypeId || "");
         setIsFormOpen(true);
       })
       .catch(() => {
@@ -112,6 +135,7 @@ export default function AdminPackagesPage() {
         setMakeupPersonCount(pkg.makeupPersonCount || 1);
         setThumbnailUrl(pkg.thumbnailUrl || "");
         setIsActive(pkg.isActive);
+        setServiceTypeId(pkg.serviceTypeId || "");
         setIsFormOpen(true);
       });
   };
@@ -182,6 +206,7 @@ export default function AdminPackagesPage() {
       makeupPersonCount: Number(makeupPersonCount),
       thumbnailUrl: thumbnailUrl || undefined,
       isActive,
+      serviceTypeId: serviceTypeId ? Number(serviceTypeId) : null,
     };
 
     setSaving(true);
@@ -283,7 +308,14 @@ export default function AdminPackagesPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4 font-semibold text-white">
-                        <div>{pkg.packageName}</div>
+                        <div className="flex items-center gap-2">
+                          <span>{pkg.packageName}</span>
+                          {pkg.serviceTypeName && (
+                            <span className="px-1.5 py-0.5 rounded bg-amber-950/40 text-gold-luxury border border-gold-luxury/25 text-[9px] font-bold font-sans">
+                              {pkg.serviceTypeName}
+                            </span>
+                          )}
+                        </div>
                         <div className="text-[10px] text-zinc-500 font-normal mt-0.5">{pkg.shortDescription}</div>
                       </td>
                       <td className="py-3 px-4 font-bold text-gold-luxury">{formatPrice(pkg.price)}</td>
@@ -408,6 +440,23 @@ export default function AdminPackagesPage() {
                   onChange={(e) => setPrice(Number(e.target.value))}
                   className="w-full bg-zinc-900 border border-zinc-800 text-zinc-200 px-3 py-2.5 rounded-lg outline-none focus:border-gold-luxury disabled:opacity-50"
                 />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Phân loại dịch vụ (Service Type)</label>
+                <select
+                  disabled={saving}
+                  value={serviceTypeId}
+                  onChange={(e) => setServiceTypeId(e.target.value)}
+                  className="w-full bg-zinc-900 border border-zinc-800 text-zinc-200 px-3 py-2.5 rounded-lg outline-none focus:border-gold-luxury disabled:opacity-50 cursor-pointer"
+                >
+                  <option value="">-- Chọn Loại dịch vụ --</option>
+                  {serviceTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.serviceName}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
