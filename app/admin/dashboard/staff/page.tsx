@@ -304,18 +304,24 @@ export default function AdminStaffPage() {
                     </td>
                     <td className="py-3 px-4 font-bold text-zinc-300">{member.yearsOfExperience ?? "—"} năm</td>
                     <td className="py-3 px-4">
-                      <button
-                        type="button"
-                        disabled={updatingProfiles.includes(member.profileId)}
-                        onClick={() => handleToggleActive(member)}
-                        className={`px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer transition-all border disabled:opacity-50 disabled:cursor-not-allowed ${
-                          member.isActive
-                            ? "bg-emerald-950/40 text-emerald-400 border-emerald-900/40 hover:bg-emerald-900/30"
-                            : "bg-red-950/40 text-red-400 border-red-900/40 hover:bg-red-900/30"
-                        }`}
-                      >
-                        {member.isActive ? "Hoạt động" : "Bị khóa"}
-                      </button>
+                      {member.roleName === "ADMIN" ? (
+                        <span className="px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-950/20 text-emerald-400 border border-emerald-900/20 select-none">
+                          Hoạt động
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={updatingProfiles.includes(member.profileId)}
+                          onClick={() => handleToggleActive(member)}
+                          className={`px-2.5 py-1 rounded text-[10px] font-bold cursor-pointer transition-all border disabled:opacity-50 disabled:cursor-not-allowed ${
+                            member.isActive
+                              ? "bg-emerald-950/40 text-emerald-400 border-emerald-900/40 hover:bg-emerald-900/30"
+                              : "bg-red-950/40 text-red-400 border-red-900/40 hover:bg-red-900/30"
+                          }`}
+                        >
+                          {member.isActive ? "Hoạt động" : "Bị khóa"}
+                        </button>
+                      )}
                     </td>
                     <td className="py-3 px-4">
                       <button
