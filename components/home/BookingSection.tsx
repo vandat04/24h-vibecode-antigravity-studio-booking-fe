@@ -131,7 +131,7 @@ export default function BookingSection() {
       .then((d) => { if (d.length) setPackages(d); })
       .catch(() => {});
 
-    guestApi.getConcepts()
+    guestApi.getConcepts(undefined, 0, 1000)
       .then(setConcepts)
       .catch(() => {});
 
@@ -442,17 +442,32 @@ export default function BookingSection() {
                           Concept mong muốn <span className="text-red-500">*</span>
                         </label>
                         <select
-                          id="conceptId" name="conceptId" required
-                          value={form.conceptId} onChange={handleChange}
+                          id="conceptId"
+                          required
+                          value={concepts.find((c) => c.id === form.conceptId)?.conceptType?.trim().toUpperCase() || ""}
+                          onChange={(e) => {
+                            const selectedType = e.target.value;
+                            const representative = concepts.find(
+                              (c) => c.conceptType?.trim().toUpperCase() === selectedType
+                            );
+                            setForm((prev) => ({
+                              ...prev,
+                              conceptId: representative ? representative.id : 0,
+                            }));
+                          }}
                           className="input-luxury bg-transparent"
                           style={{ padding: "0.5rem 0" }}
                         >
-                          <option value={0}>-- Chọn concept --</option>
-                          {concepts.map((c) => (
-                            <option key={c.id} value={c.id}>{c.title}</option>
+                          <option value="">-- Chọn concept --</option>
+                          {Array.from(
+                            new Set(concepts.map((c) => c.conceptType?.trim().toUpperCase()).filter(Boolean))
+                          ).map((type) => (
+                            <option key={type} value={type}>
+                              {type}
+                            </option>
                           ))}
                           {concepts.length === 0 && (
-                            <option disabled value={-1}>Đang tải concept...</option>
+                            <option disabled value="">Đang tải concept...</option>
                           )}
                         </select>
                       </div>

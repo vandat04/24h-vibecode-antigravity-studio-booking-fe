@@ -181,7 +181,7 @@ export default function ConceptsSection() {
 
         {/* Equal Grid Gallery */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
@@ -190,7 +190,7 @@ export default function ConceptsSection() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
             {displayedConcepts.map((concept) => (
               <ConceptCard
                 key={concept.id}

@@ -123,7 +123,7 @@ export default function TestimonialsSection() {
           {/* Left Arrow Button */}
           <button
             onClick={prevStory}
-            className="w-10 h-10 rounded-lg border border-outline-variant/30 bg-white flex items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary shadow-sm transition-all active:scale-95 cursor-pointer flex-shrink-0"
+            className="hidden md:flex w-10 h-10 rounded-lg border border-outline-variant/30 bg-white items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary shadow-sm transition-all active:scale-95 cursor-pointer flex-shrink-0"
             aria-label="Previous story"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>chevron_left</span>
@@ -131,7 +131,7 @@ export default function TestimonialsSection() {
 
           {/* Central Card */}
           <div className="flex-1 bg-white rounded-2xl p-6 md:p-8 shadow-xl border border-outline-variant/10 overflow-hidden min-h-[360px] flex items-center">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center w-full">
+            <div className="grid grid-cols-12 gap-8 items-center w-full">
               {/* Left Column: Before/After Image Hover Container */}
               <div className="col-span-12 md:col-span-6">
                 <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container-low group cursor-pointer shadow-sm">
@@ -165,7 +165,7 @@ export default function TestimonialsSection() {
 
               {/* Right Column: Story Content & Bold Name */}
               <div className="col-span-12 md:col-span-6 flex flex-col justify-center text-left">
-                <blockquote className="font-hanken text-body-lg text-on-surface mb-6 leading-relaxed text-on-surface-variant font-medium">
+                <blockquote className="font-hanken text-body-lg text-on-surface mb-6 leading-relaxed text-on-surface-variant font-medium break-words">
                   &ldquo;{story.storyContent}&rdquo;
                 </blockquote>
                 <div className="font-hanken text-on-surface text-base">
@@ -178,7 +178,7 @@ export default function TestimonialsSection() {
           {/* Right Arrow Button */}
           <button
             onClick={nextStory}
-            className="w-10 h-10 rounded-lg border border-outline-variant/30 bg-white flex items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary shadow-sm transition-all active:scale-95 cursor-pointer flex-shrink-0"
+            className="hidden md:flex w-10 h-10 rounded-lg border border-outline-variant/30 bg-white items-center justify-center text-on-surface-variant hover:border-secondary hover:text-secondary shadow-sm transition-all active:scale-95 cursor-pointer flex-shrink-0"
             aria-label="Next story"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>chevron_right</span>

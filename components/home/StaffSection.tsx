@@ -148,7 +148,7 @@ export default function StaffSection() {
         </div>
 
         {/* Tab Filter */}
-        <div className="fade-up flex justify-center gap-2 mb-12">
+        <div className="fade-up flex flex-wrap justify-center gap-2 mb-12">
           {TABS.map((tab) => (
             <button
               key={tab.value}
