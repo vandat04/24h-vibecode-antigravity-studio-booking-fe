@@ -47,6 +47,22 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    if (info?.logoUrl) {
+      const iconLinks = document.querySelectorAll("link[rel*='icon']");
+      if (iconLinks.length > 0) {
+        iconLinks.forEach((link) => {
+          (link as HTMLLinkElement).href = info.logoUrl;
+        });
+      } else {
+        const newLink = document.createElement("link");
+        newLink.rel = "icon";
+        newLink.href = info.logoUrl;
+        document.head.appendChild(newLink);
+      }
+    }
+  }, [info]);
+
+  useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -207,21 +223,33 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex flex-col leading-none"
+            className="flex items-center"
             aria-label={`${studioName} - Trang chủ`}
           >
-            <span
-              className="text-white font-playfair font-bold tracking-widest uppercase"
-              style={{ fontSize: 22, letterSpacing: "0.18em" }}
-            >
-              {firstWord}
-            </span>
-            <span
-              className="text-gold-luxury font-hanken font-light tracking-widest uppercase"
-              style={{ fontSize: 10, letterSpacing: "0.4em" }}
-            >
-              {restOfName}
-            </span>
+            {info?.logoUrl ? (
+              <div className="w-14 h-14 rounded-full overflow-hidden border border-white/15 bg-white/5 flex items-center justify-center flex-shrink-0">
+                <img
+                  src={info.logoUrl}
+                  alt={studioName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col leading-none">
+                <span
+                  className="text-white font-playfair font-bold tracking-widest uppercase"
+                  style={{ fontSize: 22, letterSpacing: "0.18em" }}
+                >
+                  {firstWord}
+                </span>
+                <span
+                  className="text-gold-luxury font-hanken font-light tracking-widest uppercase"
+                  style={{ fontSize: 10, letterSpacing: "0.4em" }}
+                >
+                  {restOfName}
+                </span>
+              </div>
+            )}
           </Link>
 
           {/* Desktop Nav */}

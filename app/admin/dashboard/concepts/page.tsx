@@ -22,6 +22,9 @@ export default function AdminConceptsPage() {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("PUBLISHED");
   const [conceptTypeFilter, setConceptTypeFilter] = useState("ALL");
+  const [allUniqueTypes, setAllUniqueTypes] = useState<string[]>([]);
+  const [selectedTypeOption, setSelectedTypeOption] = useState("");
+  const [customConceptType, setCustomConceptType] = useState("");
 
   // Upload bìa
   const [uploading, setUploading] = useState(false);
@@ -63,11 +66,30 @@ export default function AdminConceptsPage() {
     fetchConcepts();
   }, [page, conceptTypeFilter]);
 
+  useEffect(() => {
+    adminApi
+      .getConcepts(0, 1000, "ALL")
+      .then((data) => {
+        let list: any[] = [];
+        if (data && Array.isArray(data)) {
+          list = data;
+        } else if (data && data.content) {
+          list = data.content;
+        }
+        const types = Array.from(new Set(list.map((c: any) => c.conceptType?.trim().toUpperCase()).filter(Boolean)));
+        setAllUniqueTypes(types);
+      })
+      .catch(() => {});
+  }, [concepts]);
+
   const handleOpenCreate = () => {
     setEditingConcept(null);
     setConceptImages([]);
     setTitle("");
-    setConceptType("BEAUTY");
+    const defaultType = allUniqueTypes.length > 0 ? allUniqueTypes[0] : "BEAUTY";
+    setConceptType(defaultType);
+    setSelectedTypeOption(defaultType);
+    setCustomConceptType("");
     setThumbnailUrl("");
     setDescription("");
     setStatus("PUBLISHED");
@@ -95,7 +117,15 @@ export default function AdminConceptsPage() {
       .getConceptById(concept.id)
       .then((detail) => {
         setTitle(detail.title || "");
-        setConceptType(detail.conceptType || "BEAUTY");
+        const type = detail.conceptType || "BEAUTY";
+        setConceptType(type);
+        if (allUniqueTypes.includes(type)) {
+          setSelectedTypeOption(type);
+          setCustomConceptType("");
+        } else {
+          setSelectedTypeOption("CUSTOM");
+          setCustomConceptType(type);
+        }
         setThumbnailUrl(detail.thumbnailUrl || "");
         setDescription(detail.description || "");
         setStatus(detail.status || "PUBLISHED");
@@ -105,7 +135,15 @@ export default function AdminConceptsPage() {
       .catch(() => {
         // Fallback prefill from summary row
         setTitle(concept.title || "");
-        setConceptType(concept.conceptType || "BEAUTY");
+        const type = concept.conceptType || "BEAUTY";
+        setConceptType(type);
+        if (allUniqueTypes.includes(type)) {
+          setSelectedTypeOption(type);
+          setCustomConceptType("");
+        } else {
+          setSelectedTypeOption("CUSTOM");
+          setCustomConceptType(type);
+        }
         setThumbnailUrl(concept.thumbnailUrl || "");
         setDescription(concept.description || "");
         setStatus(concept.status || "PUBLISHED");
@@ -260,13 +298,9 @@ export default function AdminConceptsPage() {
             className="bg-zinc-900 border border-zinc-800 text-zinc-350 px-3 py-2.5 rounded-lg text-xs outline-none focus:border-gold-luxury cursor-pointer disabled:opacity-50"
           >
             <option value="ALL">Tất cả chủ đề</option>
-            <option value="BEAUTY">Trang điểm nghệ thuật (BEAUTY)</option>
-            <option value="COUPLE">Cặp đôi lãng mạn (COUPLE)</option>
-            <option value="BIRTHDAY">Sinh nhật nghệ thuật (BIRTHDAY)</option>
-            <option value="FAMILY">Gia đình ấm cúng (FAMILY)</option>
-            <option value="OUTDOOR">Chụp ảnh ngoại cảnh (OUTDOOR)</option>
-            <option value="EVENT">Chụp ảnh sự kiện (EVENT)</option>
-            <option value="OTHER">Chủ đề khác (OTHER)</option>
+            {allUniqueTypes.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
           </select>
 
           <button
@@ -425,22 +459,47 @@ export default function AdminConceptsPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Chủ đề / Thể loại chính</label>
+                <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Chủ đề / Thể loại chính *</label>
                 <select
-                  value={conceptType}
+                  value={selectedTypeOption}
                   disabled={saving}
-                  onChange={(e) => setConceptType(e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-2.5 rounded-lg outline-none focus:border-gold-luxury cursor-pointer disabled:opacity-50"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedTypeOption(val);
+                    if (val !== "CUSTOM") {
+                      setConceptType(val);
+                    } else {
+                      setConceptType(customConceptType);
+                    }
+                  }}
+                  className="w-full bg-zinc-900 border border-zinc-800 text-zinc-350 px-3 py-2.5 rounded-lg outline-none focus:border-gold-luxury cursor-pointer disabled:opacity-50"
                 >
-                  <option value="BEAUTY">Trang điểm nghệ thuật (BEAUTY)</option>
-                  <option value="COUPLE">Cặp đôi lãng mạn (COUPLE)</option>
-                  <option value="BIRTHDAY">Sinh nhật nghệ thuật (BIRTHDAY)</option>
-                  <option value="FAMILY">Gia đình ấm cúng (FAMILY)</option>
-                  <option value="OUTDOOR">Chụp ảnh ngoại cảnh (OUTDOOR)</option>
-                  <option value="EVENT">Chụp ảnh sự kiện (EVENT)</option>
-                  <option value="OTHER">Chủ đề khác (OTHER)</option>
+                  <option value="" disabled>-- Chọn thể loại --</option>
+                  {allUniqueTypes.map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                  <option value="CUSTOM">Khác (Tự thêm thể loại mới...)</option>
                 </select>
               </div>
+
+              {selectedTypeOption === "CUSTOM" && (
+                <div className="space-y-1.5 sm:col-span-2">
+                  <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Nhập thể loại mới *</label>
+                  <input
+                    type="text"
+                    required
+                    disabled={saving}
+                    placeholder="Ví dụ: RETRO, VINTAGE, STREETWEAR..."
+                    value={customConceptType}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase();
+                      setCustomConceptType(val);
+                      setConceptType(val);
+                    }}
+                    className="w-full bg-zinc-900 border border-zinc-800 text-zinc-250 px-3 py-2.5 rounded-lg outline-none placeholder-zinc-750 focus:border-gold-luxury disabled:opacity-50"
+                  />
+                </div>
+              )}
 
               <div className="space-y-2 sm:col-span-2">
                 <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Ảnh bìa bối cảnh (Image URL)</label>

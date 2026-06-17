@@ -14,17 +14,33 @@ const FALLBACK_CONCEPTS: ConceptSummary[] = [
   { id: 6, title: "Urban Street", slug: "urban-street", conceptType: "OUTDOOR", thumbnailUrl: "", description: "Đô thị, cá tính, hiện đại", status: "PUBLISHED", createdAt: "" },
 ];
 
-const CATEGORIES: { label: string; value: string }[] = [
-  { label: "Tất cả", value: "" },
-  { label: "Beauty", value: "BEAUTY" },
-  { label: "Cặp đôi", value: "COUPLE" },
-  { label: "Sinh nhật", value: "BIRTHDAY" },
-  { label: "Gia đình", value: "FAMILY" },
-  { label: "Ngoại cảnh", value: "OUTDOOR" },
-];
-
 export default function ConceptsSection() {
   const [concepts, setConcepts] = useState<ConceptSummary[]>(FALLBACK_CONCEPTS);
+  const getCategoryLabel = (type: string) => {
+    switch (type.toUpperCase()) {
+      case "BEAUTY": return "Beauty";
+      case "COUPLE": return "Cặp đôi";
+      case "BIRTHDAY": return "Sinh nhật";
+      case "FAMILY": return "Gia đình";
+      case "OUTDOOR": return "Ngoại cảnh";
+      case "EVENT": return "Sự kiện";
+      case "OTHER": return "Khác";
+      default:
+        return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+    }
+  };
+
+  const uniqueTypes = Array.from(
+    new Set(concepts.map((c) => c.conceptType?.trim().toUpperCase()).filter(Boolean))
+  );
+
+  const categories = [
+    { label: "Tất cả", value: "" },
+    ...uniqueTypes.map((type) => ({
+      label: getCategoryLabel(type),
+      value: type,
+    })),
+  ];
   const [activeCategory, setActiveCategory] = useState("");
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
@@ -148,7 +164,7 @@ export default function ConceptsSection() {
 
         {/* Category Filter */}
         <div className="fade-up flex flex-wrap gap-2 justify-center mb-12">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => setActiveCategory(cat.value)}
@@ -176,45 +192,11 @@ export default function ConceptsSection() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {displayedConcepts.map((concept) => (
-              <div
+              <ConceptCard
                 key={concept.id}
+                concept={concept}
                 onClick={() => handleOpenModal(concept)}
-                className="fade-up group relative aspect-[4/5] w-full overflow-hidden cursor-pointer rounded-xl bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
-              >
-                {/* Image or Placeholder */}
-                {concept.thumbnailUrl ? (
-                  <Image
-                    src={concept.thumbnailUrl}
-                    alt={concept.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 20vw"
-                  />
-                ) : (
-                  <div className="concept-placeholder w-full h-full bg-gray-50 flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="material-symbols-outlined text-gray-400" style={{ fontSize: 40 }}>
-                        image
-                      </span>
-                      <span className="text-gray-400 font-hanken text-xs">{concept.title}</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                {/* Info */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                  <span className="font-hanken text-label-sm text-gold-luxury uppercase tracking-widest mb-1 block">
-                    {concept.conceptType}
-                  </span>
-                  <h3 className="font-playfair text-white text-headline-md font-bold">{concept.title}</h3>
-                  {concept.description && (
-                    <p className="font-hanken text-white/70 text-xs mt-1 line-clamp-2">{concept.description}</p>
-                  )}
-                </div>
-              </div>
+              />
             ))}
           </div>
         )}
@@ -327,12 +309,9 @@ export default function ConceptsSection() {
                         key={img.id}
                         className="relative aspect-[3/4] rounded-xl overflow-hidden bg-zinc-100 group"
                       >
-                        <Image
+                        <ConceptGalleryImage
                           src={img.imageUrl}
                           alt={`${selectedConcept.title} gallery`}
-                          fill
-                          sizes="(max-width: 768px) 50vw, 33vw"
-                          className="object-cover transition-transform duration-500 hover:scale-105"
                         />
                       </div>
                     ))}
@@ -359,5 +338,81 @@ export default function ConceptsSection() {
         </div>
       )}
     </section>
+  );
+}
+
+// Resilient Card Component to prevent page crashes on invalid/broken image URLs
+function ConceptCard({ concept, onClick }: { concept: ConceptSummary; onClick: () => void }) {
+  const [imgError, setImgError] = useState(false);
+  const isValidUrl = concept.thumbnailUrl && 
+    (concept.thumbnailUrl.startsWith("http://") || 
+     concept.thumbnailUrl.startsWith("https://") || 
+     concept.thumbnailUrl.startsWith("/"));
+
+  return (
+    <div
+      onClick={onClick}
+      className="fade-up group relative aspect-[4/5] w-full overflow-hidden cursor-pointer rounded-xl bg-white shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
+    >
+      {/* Image or Placeholder */}
+      {isValidUrl && !imgError ? (
+        <img
+          src={concept.thumbnailUrl}
+          alt={concept.title}
+          onError={() => setImgError(true)}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          loading="lazy"
+        />
+      ) : (
+        <div className="concept-placeholder w-full h-full bg-zinc-900/10 flex items-center justify-center border border-zinc-800/10">
+          <div className="flex flex-col items-center gap-2">
+            <span className="material-symbols-outlined text-zinc-400" style={{ fontSize: 40 }}>
+              broken_image
+            </span>
+            <span className="text-zinc-500 font-hanken text-xs text-center px-4 font-semibold">{concept.title}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      {/* Info */}
+      <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+        <span className="font-hanken text-label-sm text-gold-luxury uppercase tracking-widest mb-1 block">
+          {concept.conceptType}
+        </span>
+        <h3 className="font-playfair text-white text-headline-md font-bold">{concept.title}</h3>
+        {concept.description && (
+          <p className="font-hanken text-white/70 text-xs mt-1 line-clamp-2">{concept.description}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Resilient Image component for Modal Gallery
+function ConceptGalleryImage({ src, alt }: { src: string; alt: string }) {
+  const [imgError, setImgError] = useState(false);
+  const isValidUrl = src && (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("/"));
+
+  if (!isValidUrl || imgError) {
+    return (
+      <div className="w-full h-full bg-zinc-100 flex items-center justify-center border border-zinc-200">
+        <span className="material-symbols-outlined text-zinc-400" style={{ fontSize: 32 }}>
+          broken_image
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setImgError(true)}
+      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+      loading="lazy"
+    />
   );
 }
