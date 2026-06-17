@@ -130,10 +130,10 @@ export default function TestimonialsSection() {
           </button>
 
           {/* Central Card */}
-          <div className="flex-1 bg-white rounded-2xl p-6 md:p-8 shadow-xl border border-outline-variant/10 overflow-hidden min-h-[360px] flex items-center">
-            <div className="grid grid-cols-12 gap-8 items-center w-full">
+          <div className="flex-1 bg-white rounded-2xl p-6 md:p-8 shadow-xl border border-outline-variant/10 overflow-hidden min-h-[360px] flex flex-col justify-center">
+            <div className="flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-8 items-center w-full">
               {/* Left Column: Before/After Image Hover Container */}
-              <div className="col-span-12 md:col-span-6">
+              <div className="w-full md:col-span-6">
                 <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-surface-container-low group cursor-pointer shadow-sm">
                   {/* Before Image */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -164,7 +164,7 @@ export default function TestimonialsSection() {
               </div>
 
               {/* Right Column: Story Content & Bold Name */}
-              <div className="col-span-12 md:col-span-6 flex flex-col justify-center text-left">
+              <div className="w-full md:col-span-6 flex flex-col justify-center text-left">
                 <blockquote className="font-hanken text-body-lg text-on-surface mb-6 leading-relaxed text-on-surface-variant font-medium break-words text-justify">
                   &ldquo;{story.storyContent}&rdquo;
                 </blockquote>

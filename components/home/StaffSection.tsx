@@ -138,7 +138,7 @@ export default function StaffSection() {
         <div className="text-center mb-12">
           <h2
             id="team-heading"
-            className="fade-up font-playfair text-2xl md:text-3xl lg:text-4xl text-zinc-900 font-extrabold uppercase tracking-tight mb-3"
+            className="fade-up font-playfair text-xl sm:text-2xl md:text-3xl lg:text-4xl text-zinc-900 font-extrabold uppercase tracking-tight mb-3"
           >
             Gặp Gỡ Đội Ngũ Của Chúng Tôi
           </h2>

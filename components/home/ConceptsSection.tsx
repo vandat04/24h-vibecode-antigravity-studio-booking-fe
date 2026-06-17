@@ -245,7 +245,7 @@ export default function ConceptsSection() {
         <div className="text-center mt-12">
           <a
             href="/#booking"
-            className="inline-flex items-center gap-2 border border-primary text-on-surface hover:bg-primary hover:text-on-primary font-hanken text-sm font-semibold uppercase tracking-widest px-8 py-3.5 transition-all duration-300"
+            className="inline-flex items-center gap-2 border border-primary text-on-surface hover:bg-primary hover:text-on-primary font-hanken text-xs md:text-sm font-semibold uppercase tracking-widest px-5 md:px-8 py-3.5 transition-all duration-300 whitespace-nowrap"
           >
             Đặt lịch với concept yêu thích
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_forward</span>
