@@ -165,7 +165,7 @@ export default function TestimonialsSection() {
 
               {/* Right Column: Story Content & Bold Name */}
               <div className="col-span-12 md:col-span-6 flex flex-col justify-center text-left">
-                <blockquote className="font-hanken text-body-lg text-on-surface mb-6 leading-relaxed text-on-surface-variant font-medium break-words">
+                <blockquote className="font-hanken text-body-lg text-on-surface mb-6 leading-relaxed text-on-surface-variant font-medium break-words text-justify">
                   &ldquo;{story.storyContent}&rdquo;
                 </blockquote>
                 <div className="font-hanken text-on-surface text-base">
