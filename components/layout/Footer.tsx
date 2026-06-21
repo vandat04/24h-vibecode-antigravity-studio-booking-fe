@@ -68,7 +68,7 @@ export default function Footer() {
               <span className="font-playfair font-bold text-2xl tracking-widest uppercase text-white block">
                 {firstWord}
               </span>
-              <span className="font-hanken font-light text-xs tracking-[0.4em] uppercase text-gold-luxury block">
+              <span className="font-hanken font-light text-xs tracking-[0.4em] uppercase text-white block">
                 {restOfName}
               </span>
             </div>
