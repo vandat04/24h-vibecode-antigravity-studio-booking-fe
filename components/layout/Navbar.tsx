@@ -243,7 +243,7 @@ export default function Navbar() {
                   {firstWord}
                 </span>
                 <span
-                  className="text-gold-luxury font-hanken font-light tracking-widest uppercase"
+                  className="text-white font-hanken font-light tracking-widest uppercase"
                   style={{ fontSize: 10, letterSpacing: "0.4em" }}
                 >
                   {restOfName}
