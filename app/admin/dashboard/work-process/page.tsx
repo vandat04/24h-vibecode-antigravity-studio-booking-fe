@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "@/lib/api";
 import type { ProcessPhase, ProcessStep, ProcessPhaseRequest, ProcessStepRequest } from "@/types";
+import { useToast } from "@/context/ToastContext";
 
 const PRESET_ICONS = [
   { name: "groups", label: "Tư vấn/Nhóm" },
@@ -18,13 +19,12 @@ const PRESET_ICONS = [
 ];
 
 export default function AdminWorkProcessPage() {
+  const { showSuccess, showError, showWarning } = useToast();
   const [activeTab, setActiveTab] = useState<"steps" | "phases">("steps");
 
   const [phases, setPhases] = useState<ProcessPhase[]>([]);
   const [steps, setSteps] = useState<ProcessStep[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
 
   // Phase Modal State
   const [isPhaseModalOpen, setIsPhaseModalOpen] = useState(false);
@@ -51,7 +51,6 @@ export default function AdminWorkProcessPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      setError("");
       const [phaseData, stepData] = await Promise.all([
         adminApi.getAdminPhases(),
         adminApi.getAdminSteps(),
@@ -59,7 +58,7 @@ export default function AdminWorkProcessPage() {
       setPhases(phaseData || []);
       setSteps(stepData || []);
     } catch (err: any) {
-      setError(err.message || "Không thể tải dữ liệu quy trình làm việc.");
+      showError(err.message || "Không thể tải dữ liệu quy trình làm việc.");
     } finally {
       setLoading(false);
     }
@@ -72,7 +71,7 @@ export default function AdminWorkProcessPage() {
   // --- PHASE MODAL HANDLERS ---
   const openAddPhaseModal = () => {
     setEditingPhase(null);
-    setPhaseCode(`GIAI ĐOẠN ${phases.length + 1}`);
+    setPhaseCode(`PHASE_${phases.length + 1}`);
     setPhaseName("");
     setPhaseDesc("");
     setPhaseSort(phases.length + 1);
@@ -92,8 +91,8 @@ export default function AdminWorkProcessPage() {
 
   const handlePhaseSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phaseCode.trim()) return alert("Vui lòng nhập mã giai đoạn!");
-    if (!phaseName.trim()) return alert("Vui lòng nhập tên giai đoạn!");
+    if (!phaseCode.trim()) return showWarning("Vui lòng nhập mã giai đoạn!");
+    if (!phaseName.trim()) return showWarning("Vui lòng nhập tên giai đoạn!");
 
     setSubmitting(true);
     const payload: ProcessPhaseRequest = {
@@ -107,16 +106,15 @@ export default function AdminWorkProcessPage() {
     try {
       if (editingPhase) {
         await adminApi.updateAdminPhase(editingPhase.id, payload);
-        setSuccessMsg("Cập nhật giai đoạn thành công!");
+        showSuccess("Cập nhật giai đoạn thành công!");
       } else {
         await adminApi.createAdminPhase(payload);
-        setSuccessMsg("Thêm giai đoạn mới thành công!");
+        showSuccess("Thêm giai đoạn mới thành công!");
       }
       setIsPhaseModalOpen(false);
       fetchData();
-      setTimeout(() => setSuccessMsg(""), 3000);
     } catch (err: any) {
-      alert(err.message || "Thao tác thất bại.");
+      showError(err.message || "Thao tác thất bại.");
     } finally {
       setSubmitting(false);
     }
@@ -126,11 +124,10 @@ export default function AdminWorkProcessPage() {
     if (!confirm("Bạn có chắc muốn xóa giai đoạn này? Lưu ý: Tất cả các bước thuộc giai đoạn này cũng sẽ bị xóa.")) return;
     try {
       await adminApi.deleteAdminPhase(id);
-      setSuccessMsg("Đã xóa giai đoạn.");
+      showSuccess("Đã xóa giai đoạn.");
       fetchData();
-      setTimeout(() => setSuccessMsg(""), 3000);
     } catch (err: any) {
-      alert(err.message || "Xóa thất bại.");
+      showError(err.message || "Xóa thất bại.");
     }
   };
 
@@ -162,9 +159,9 @@ export default function AdminWorkProcessPage() {
 
   const handleStepSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stepPhaseId) return alert("Vui lòng chọn Giai đoạn!");
-    if (!stepTitle.trim()) return alert("Vui lòng nhập tiêu đề!");
-    if (!stepDesc.trim()) return alert("Vui lòng nhập nội dung!");
+    if (!stepPhaseId) return showWarning("Vui lòng chọn Giai đoạn!");
+    if (!stepTitle.trim()) return showWarning("Vui lòng nhập tiêu đề!");
+    if (!stepDesc.trim()) return showWarning("Vui lòng nhập nội dung!");
 
     setSubmitting(true);
     const payload: ProcessStepRequest = {
@@ -180,16 +177,15 @@ export default function AdminWorkProcessPage() {
     try {
       if (editingStep) {
         await adminApi.updateAdminStep(editingStep.id, payload);
-        setSuccessMsg("Cập nhật bước quy trình thành công!");
+        showSuccess("Cập nhật bước quy trình thành công!");
       } else {
         await adminApi.createAdminStep(payload);
-        setSuccessMsg("Thêm bước quy trình mới thành công!");
+        showSuccess("Thêm bước quy trình mới thành công!");
       }
       setIsStepModalOpen(false);
       fetchData();
-      setTimeout(() => setSuccessMsg(""), 3000);
     } catch (err: any) {
-      alert(err.message || "Thao tác thất bại.");
+      showError(err.message || "Thao tác thất bại.");
     } finally {
       setSubmitting(false);
     }
@@ -198,9 +194,10 @@ export default function AdminWorkProcessPage() {
   const handleToggleStep = async (step: ProcessStep) => {
     try {
       await adminApi.toggleAdminStepDisplay(step.id);
+      showSuccess(`Đã ${step.isDisplayed ? "ẩn" : "hiển thị"} bước "${step.title}".`);
       fetchData();
     } catch (err: any) {
-      alert(err.message || "Không thể đổi trạng thái.");
+      showError(err.message || "Không thể đổi trạng thái.");
     }
   };
 
@@ -208,11 +205,10 @@ export default function AdminWorkProcessPage() {
     if (!confirm("Bạn có chắc muốn xóa bước công việc này?")) return;
     try {
       await adminApi.deleteAdminStep(id);
-      setSuccessMsg("Đã xóa bước công việc.");
+      showSuccess("Đã xóa bước quy trình.");
       fetchData();
-      setTimeout(() => setSuccessMsg(""), 3000);
     } catch (err: any) {
-      alert(err.message || "Xóa thất bại.");
+      showError(err.message || "Xóa thất bại.");
     }
   };
 
@@ -278,20 +274,6 @@ export default function AdminWorkProcessPage() {
           Giai Đoạn Làm Việc ({phases.length})
         </button>
       </div>
-
-      {/* Alerts */}
-      {successMsg && (
-        <div className="bg-emerald-950/40 border border-emerald-800 text-emerald-300 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-          <span className="material-symbols-outlined text-emerald-400" style={{ fontSize: 20 }}>check_circle</span>
-          {successMsg}
-        </div>
-      )}
-      {error && (
-        <div className="bg-rose-950/40 border border-rose-800 text-rose-300 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-          <span className="material-symbols-outlined text-rose-400" style={{ fontSize: 20 }}>error</span>
-          {error}
-        </div>
-      )}
 
       {/* Content for TAB 1: STEPS */}
       {activeTab === "steps" && (

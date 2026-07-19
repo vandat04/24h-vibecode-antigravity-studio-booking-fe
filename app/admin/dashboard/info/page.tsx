@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import { adminApi } from "@/lib/api";
+import { useToast } from "@/context/ToastContext";
 
 export default function AdminStudioInfoPage() {
+  const { showSuccess, showError, showWarning } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -33,10 +35,6 @@ export default function AdminStudioInfoPage() {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
-  // Notifications
-  const [errorMsg, setErrorMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-
   // Fetch current studio information
   const fetchStudioInfo = () => {
     setLoading(true);
@@ -63,8 +61,8 @@ export default function AdminStudioInfoPage() {
           setGoogleMapUrl(data.googleMapUrl || "");
         }
       })
-      .catch((err) => {
-        setErrorMsg("Lỗi không thể tải cấu hình thông tin Studio từ server.");
+      .catch(() => {
+        showError("Lỗi không thể tải cấu hình thông tin Studio từ server.");
       })
       .finally(() => setLoading(false));
   };
@@ -77,18 +75,16 @@ export default function AdminStudioInfoPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingLogo(true);
-    setErrorMsg("");
-    setSuccessMsg("");
     try {
       const res = await adminApi.uploadFile(file, "studio");
       if (res && res.url) {
         setLogoUrl(res.url);
-        setSuccessMsg("Tải logo lên Cloudinary thành công!");
+        showSuccess("Tải logo lên Cloudinary thành công!");
       } else {
-        setErrorMsg("Tải ảnh thất bại!");
+        showError("Tải ảnh thất bại!");
       }
     } catch (err: any) {
-      setErrorMsg(err.message || "Lỗi tải logo!");
+      showError(err.message || "Lỗi tải logo!");
     } finally {
       setUploadingLogo(false);
       if (e.target) e.target.value = "";
@@ -99,18 +95,16 @@ export default function AdminStudioInfoPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingBanner(true);
-    setErrorMsg("");
-    setSuccessMsg("");
     try {
       const res = await adminApi.uploadFile(file, "studio");
       if (res && res.url) {
         setBannerUrl(res.url);
-        setSuccessMsg("Tải banner lên Cloudinary thành công!");
+        showSuccess("Tải banner lên Cloudinary thành công!");
       } else {
-        setErrorMsg("Tải ảnh thất bại!");
+        showError("Tải ảnh thất bại!");
       }
     } catch (err: any) {
-      setErrorMsg(err.message || "Lỗi tải banner!");
+      showError(err.message || "Lỗi tải banner!");
     } finally {
       setUploadingBanner(false);
       if (e.target) e.target.value = "";
@@ -119,19 +113,17 @@ export default function AdminStudioInfoPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg("");
-    setSuccessMsg("");
 
     // Frontend validations
     if (!studioName.trim() || !logoUrl.trim() || !bannerUrl.trim() || !address.trim() || !phone.trim() || !email.trim() || !introduction.trim() || !workingProcess.trim() || !googleMapUrl.trim()) {
-      setErrorMsg("Vui lòng điền đầy đủ các thông tin bắt buộc (*).");
+      showWarning("Vui lòng điền đầy đủ các thông tin bắt buộc (*).");
       return;
     }
 
     setSaving(true);
 
     const payload = {
-      id: 1, // ID mặc định luôn là 1 trong CSDL cho thông tin Studio đơn nhất
+      id: 1,
       studioName,
       logoUrl,
       bannerUrl,
@@ -154,11 +146,11 @@ export default function AdminStudioInfoPage() {
     adminApi
       .updateStudioInfoAdmin(payload)
       .then(() => {
-        setSuccessMsg("Cập nhật thông tin cấu hình Studio thành công!");
+        showSuccess("Cập nhật thông tin cấu hình Studio thành công!");
         fetchStudioInfo();
       })
       .catch((err) => {
-        setErrorMsg(err.message || "Lỗi lưu thông tin cấu hình Studio.");
+        showError(err.message || "Lỗi lưu thông tin cấu hình Studio.");
       })
       .finally(() => setSaving(false));
   };
@@ -181,9 +173,6 @@ export default function AdminStudioInfoPage() {
         <h2 className="font-playfair text-2xl font-bold text-white">Cấu hình thông tin Studio</h2>
         <p className="text-xs text-zinc-400 mt-1">Quản lý toàn bộ thông tin giới thiệu, liên hệ, ảnh thương hiệu, logo, banner, các kênh mạng xã hội hiển thị trên website.</p>
       </div>
-
-      {errorMsg && <div className="bg-red-950/40 text-red-400 border border-red-900/40 px-4 py-2.5 rounded-lg font-semibold">⚠️ {errorMsg}</div>}
-      {successMsg && <div className="bg-emerald-950/40 text-emerald-400 border border-emerald-900/40 px-4 py-2.5 rounded-lg font-semibold">✓ {successMsg}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* ROW 1: THÔNG TIN LIÊN HỆ & THƯƠNG HIỆU */}

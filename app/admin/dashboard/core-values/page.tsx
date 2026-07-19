@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "@/lib/api";
 import type { CoreValue, CoreValueRequest } from "@/types";
+import { useToast } from "@/context/ToastContext";
 
 const PRESET_ICONS = [
   { name: "verified_user", label: "Khiên bảo vệ" },
@@ -18,10 +19,9 @@ const PRESET_ICONS = [
 ];
 
 export default function AdminCoreValuesPage() {
+  const { showSuccess, showError, showWarning } = useToast();
   const [coreValues, setCoreValues] = useState<CoreValue[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,11 +38,10 @@ export default function AdminCoreValuesPage() {
   const fetchCoreValues = async () => {
     try {
       setLoading(true);
-      setError("");
       const data = await adminApi.getAdminCoreValues();
       setCoreValues(data || []);
     } catch (err: any) {
-      setError(err.message || "Không thể tải danh sách giá trị cốt lõi.");
+      showError(err.message || "Không thể tải danh sách giá trị cốt lõi.");
     } finally {
       setLoading(false);
     }
@@ -79,11 +78,10 @@ export default function AdminCoreValuesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return alert("Vui lòng nhập tiêu đề!");
-    if (!description.trim()) return alert("Vui lòng nhập nội dung mô tả!");
+    if (!title.trim()) return showWarning("Vui lòng nhập tiêu đề!");
+    if (!description.trim()) return showWarning("Vui lòng nhập nội dung mô tả!");
 
     setSubmitting(true);
-    setError("");
 
     const payload: CoreValueRequest = {
       title: title.trim(),
@@ -96,16 +94,15 @@ export default function AdminCoreValuesPage() {
     try {
       if (editingItem) {
         await adminApi.updateAdminCoreValue(editingItem.id, payload);
-        setSuccessMsg("Cập nhật giá trị cốt lõi thành công!");
+        showSuccess("Cập nhật giá trị cốt lõi thành công!");
       } else {
         await adminApi.createAdminCoreValue(payload);
-        setSuccessMsg("Thêm giá trị cốt lõi mới thành công!");
+        showSuccess("Thêm giá trị cốt lõi mới thành công!");
       }
       closeModal();
       fetchCoreValues();
-      setTimeout(() => setSuccessMsg(""), 3000);
     } catch (err: any) {
-      alert(err.message || "Thao tác thất bại.");
+      showError(err.message || "Thao tác thất bại.");
     } finally {
       setSubmitting(false);
     }
@@ -114,9 +111,10 @@ export default function AdminCoreValuesPage() {
   const handleToggle = async (item: CoreValue) => {
     try {
       await adminApi.toggleAdminCoreValueDisplay(item.id);
+      showSuccess(`Đã ${item.isDisplayed ? "ẩn" : "hiển thị"} giá trị "${item.title}".`);
       fetchCoreValues();
     } catch (err: any) {
-      alert(err.message || "Không thể thay đổi trạng thái.");
+      showError(err.message || "Không thể thay đổi trạng thái.");
     }
   };
 
@@ -124,11 +122,10 @@ export default function AdminCoreValuesPage() {
     if (!confirm("Bạn có chắc chắn muốn xóa giá trị cốt lõi này?")) return;
     try {
       await adminApi.deleteAdminCoreValue(id);
-      setSuccessMsg("Đã xóa giá trị cốt lõi.");
+      showSuccess("Đã xóa giá trị cốt lõi.");
       fetchCoreValues();
-      setTimeout(() => setSuccessMsg(""), 3000);
     } catch (err: any) {
-      alert(err.message || "Xóa thất bại.");
+      showError(err.message || "Xóa thất bại.");
     }
   };
 
@@ -156,22 +153,6 @@ export default function AdminCoreValuesPage() {
           Thêm Giá Trị Cốt Lõi
         </button>
       </div>
-
-      {/* Success Alert */}
-      {successMsg && (
-        <div className="bg-emerald-950/40 border border-emerald-800 text-emerald-300 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-          <span className="material-symbols-outlined text-emerald-400" style={{ fontSize: 20 }}>check_circle</span>
-          {successMsg}
-        </div>
-      )}
-
-      {/* Error Alert */}
-      {error && (
-        <div className="bg-rose-950/40 border border-rose-800 text-rose-300 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-          <span className="material-symbols-outlined text-rose-400" style={{ fontSize: 20 }}>error</span>
-          {error}
-        </div>
-      )}
 
       {/* List Table */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-xl">
