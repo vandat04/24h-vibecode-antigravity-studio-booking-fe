@@ -7,13 +7,13 @@ import { guestApi, authApi } from "@/lib/api";
 import type { StudioInfo, BookingLookupResponse } from "@/types";
 
 const NAV_LINKS = [
-  { label: "Trang chủ", href: "/" },
-  { label: "Dịch vụ", href: "/#services" },
-  { label: "Concept", href: "/#concepts" },
-  { label: "Đội ngũ", href: "/#team" },
-  { label: "Tra cứu đơn", href: "#lookup" },
-  { label: "Đặt lịch", href: "/#booking" },
-  { label: "Blog", href: "/#blog" },
+  { label: "ABOUT", href: "/#brand-story" },
+  { label: "PROCESS", href: "/#work-process" },
+  { label: "SERVICES", href: "/#services" },
+  { label: "CONCEPTS", href: "/#concepts" },
+  { label: "TEAM", href: "/#team" },
+  { label: "LOOKUP", href: "#lookup" },
+  { label: "BLOG", href: "/#blog" },
 ];
 
 export default function Navbar() {

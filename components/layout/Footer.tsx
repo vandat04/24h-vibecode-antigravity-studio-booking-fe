@@ -6,12 +6,12 @@ import { guestApi } from "@/lib/api";
 import type { StudioInfo } from "@/types";
 
 const FOOTER_LINKS = [
-  { label: "Trang chủ", href: "/" },
-  { label: "Dịch vụ", href: "/#services" },
-  { label: "Concept", href: "/#concepts" },
-  { label: "Đội ngũ", href: "/#team" },
-  { label: "Đặt lịch", href: "/#booking" },
-  { label: "Blog", href: "/#blog" },
+  { label: "ABOUT", href: "/#brand-story" },
+  { label: "PROCESS", href: "/#work-process" },
+  { label: "SERVICES", href: "/#services" },
+  { label: "CONCEPTS", href: "/#concepts" },
+  { label: "TEAM", href: "/#team" },
+  { label: "BLOG", href: "/#blog" },
 ];
 
 export default function Footer() {

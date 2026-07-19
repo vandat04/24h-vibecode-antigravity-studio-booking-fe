@@ -2,6 +2,8 @@
 
 
 @theme {
+  --font-playfair: 'Playfair Display', serif;
+  --font-hanken: 'Hanken Grotesk', sans-serif;
   --color-gold-luxury: #D4AF37;
   --color-gold-dark: #b8952e;
   --color-secondary: #735c00;
@@ -46,6 +48,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   max-width: 100%;
+}
+
+/* Explicit Font Utility Classes */
+.font-playfair {
+  font-family: 'Playfair Display', serif !important;
+}
+
+.font-hanken {
+  font-family: 'Hanken Grotesk', sans-serif !important;
 }
 
 /* ============================================

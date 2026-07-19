@@ -1,6 +1,8 @@
 import HeroSection from "@/components/home/HeroSection";
 import BrandStorySection from "@/components/home/BrandStorySection";
+import CoreValuesSection from "@/components/home/CoreValuesSection";
 import ServicesSection from "@/components/home/ServicesSection";
+import WorkProcessSection from "@/components/home/WorkProcessSection";
 import ConceptsSection from "@/components/home/ConceptsSection";
 import StaffSection from "@/components/home/StaffSection";
 import BookingSection from "@/components/home/BookingSection";
@@ -12,7 +14,9 @@ export default function HomePage() {
     <>
       <HeroSection />
       <BrandStorySection />
+      <CoreValuesSection />
       <ServicesSection />
+      <WorkProcessSection />
       <ConceptsSection />
       <StaffSection />
       <BookingSection />

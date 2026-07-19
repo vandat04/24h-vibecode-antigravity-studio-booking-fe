@@ -46,6 +46,12 @@ import type {
   LoginRequest,
   LoginResponse,
   ServiceType,
+  CoreValue,
+  CoreValueRequest,
+  ProcessPhase,
+  ProcessStep,
+  ProcessPhaseRequest,
+  ProcessStepRequest,
 } from "@/types";
 
 // ═══════════════════════════════════════════════════════════════════
@@ -144,6 +150,16 @@ export const guestApi = {
     apiFetch<BookingLookupResponse>(
       `/api/studio/bookings/lookup?phone=${encodeURIComponent(phone)}&code=${encodeURIComponent(code)}`
     ),
+
+  // ── API 13: Giá trị cốt lõi ───────────────────────────────────────
+  /** GET /api/studio/core-values */
+  getCoreValues: () =>
+    apiFetch<CoreValue[]>("/api/studio/core-values"),
+
+  // ── API 14: Quy trình làm việc ─────────────────────────────────────
+  /** GET /api/studio/work-process */
+  getWorkProcess: () =>
+    apiFetch<ProcessPhase[]>("/api/studio/work-process"),
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -539,5 +555,88 @@ export const adminApi = {
       method: "PUT",
       headers: authHeader(),
       body: JSON.stringify(data),
+    }),
+
+  // --- Core Values CMS ---
+  getAdminCoreValues: () =>
+    apiFetch<CoreValue[]>("/api/admin/core-values", { headers: authHeader() }),
+
+  createAdminCoreValue: (data: CoreValueRequest) =>
+    apiFetch<CoreValue>("/api/admin/core-values", {
+      method: "POST",
+      headers: authHeader(),
+      body: JSON.stringify(data),
+    }),
+
+  updateAdminCoreValue: (id: number, data: CoreValueRequest) =>
+    apiFetch<CoreValue>(`/api/admin/core-values/${id}`, {
+      method: "PUT",
+      headers: authHeader(),
+      body: JSON.stringify(data),
+    }),
+
+  deleteAdminCoreValue: (id: number) =>
+    apiFetch<any>(`/api/admin/core-values/${id}`, {
+      method: "DELETE",
+      headers: authHeader(),
+    }),
+
+  toggleAdminCoreValueDisplay: (id: number) =>
+    apiFetch<CoreValue>(`/api/admin/core-values/${id}/toggle`, {
+      method: "PATCH",
+      headers: authHeader(),
+    }),
+
+  // --- Work Process & Phases CMS ---
+  getAdminPhases: () =>
+    apiFetch<ProcessPhase[]>("/api/admin/work-process/phases", { headers: authHeader() }),
+
+  createAdminPhase: (data: ProcessPhaseRequest) =>
+    apiFetch<ProcessPhase>("/api/admin/work-process/phases", {
+      method: "POST",
+      headers: authHeader(),
+      body: JSON.stringify(data),
+    }),
+
+  updateAdminPhase: (id: number, data: ProcessPhaseRequest) =>
+    apiFetch<ProcessPhase>(`/api/admin/work-process/phases/${id}`, {
+      method: "PUT",
+      headers: authHeader(),
+      body: JSON.stringify(data),
+    }),
+
+  deleteAdminPhase: (id: number) =>
+    apiFetch<any>(`/api/admin/work-process/phases/${id}`, {
+      method: "DELETE",
+      headers: authHeader(),
+    }),
+
+  getAdminSteps: () =>
+    apiFetch<ProcessStep[]>("/api/admin/work-process/steps", { headers: authHeader() }),
+
+  createAdminStep: (data: ProcessStepRequest) =>
+    apiFetch<ProcessStep>("/api/admin/work-process/steps", {
+      method: "POST",
+      headers: authHeader(),
+      body: JSON.stringify(data),
+    }),
+
+  updateAdminStep: (id: number, data: ProcessStepRequest) =>
+    apiFetch<ProcessStep>(`/api/admin/work-process/steps/${id}`, {
+      method: "PUT",
+      headers: authHeader(),
+      body: JSON.stringify(data),
+    }),
+
+  deleteAdminStep: (id: number) =>
+    apiFetch<any>(`/api/admin/work-process/steps/${id}`, {
+      method: "DELETE",
+      headers: authHeader(),
+    }),
+
+  toggleAdminStepDisplay: (id: number) =>
+    apiFetch<ProcessStep>(`/api/admin/work-process/steps/${id}/toggle`, {
+      method: "PATCH",
+      headers: authHeader(),
     }),
 };

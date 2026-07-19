@@ -21,6 +21,8 @@ export default function AdminStudioInfoPage() {
   const [tiktokUrl, setTiktokUrl] = useState("");
   const [introVideoUrl, setIntroVideoUrl] = useState("");
   const [introduction, setIntroduction] = useState("");
+  const [vision, setVision] = useState("");
+  const [mission, setMission] = useState("");
   const [workingProcess, setWorkingProcess] = useState("");
   const [googleMapUrl, setGoogleMapUrl] = useState("");
 
@@ -55,6 +57,8 @@ export default function AdminStudioInfoPage() {
           setTiktokUrl(data.tiktokUrl || "");
           setIntroVideoUrl(data.introVideoUrl || "");
           setIntroduction(data.introduction || "");
+          setVision(data.vision || "");
+          setMission(data.mission || "");
           setWorkingProcess(data.workingProcess || "");
           setGoogleMapUrl(data.googleMapUrl || "");
         }
@@ -141,6 +145,8 @@ export default function AdminStudioInfoPage() {
       tiktokUrl: tiktokUrl || null,
       introVideoUrl: introVideoUrl || null,
       introduction,
+      vision: vision || null,
+      mission: mission || null,
       workingProcess,
       googleMapUrl,
     };
@@ -446,7 +452,7 @@ export default function AdminStudioInfoPage() {
             <div className="space-y-1.5">
               <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Lời giới thiệu tổng quan Studio *</label>
               <textarea
-                rows={6}
+                rows={5}
                 required
                 placeholder="Leon Studio là studio chuyên về chụp ảnh beauty, trang điểm nghệ thuật cao cấp..."
                 value={introduction}
@@ -456,9 +462,31 @@ export default function AdminStudioInfoPage() {
             </div>
 
             <div className="space-y-1.5">
+              <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Tầm nhìn định hướng (Vision)</label>
+              <textarea
+                rows={5}
+                placeholder="Trở thành Studio chụp ảnh nghệ thuật hàng đầu..."
+                value={vision}
+                onChange={(e) => setVision(e.target.value)}
+                className="w-full bg-zinc-950 border border-zinc-850 text-zinc-200 px-3 py-2.5 rounded-lg outline-none resize-none focus:border-gold-luxury"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Sứ mệnh cam kết (Mission)</label>
+              <textarea
+                rows={5}
+                placeholder="Mang đến cho mỗi khách hàng trải nghiệm nhiếp ảnh độc bản..."
+                value={mission}
+                onChange={(e) => setMission(e.target.value)}
+                className="w-full bg-zinc-950 border border-zinc-850 text-zinc-200 px-3 py-2.5 rounded-lg outline-none resize-none focus:border-gold-luxury"
+              />
+            </div>
+
+            <div className="space-y-1.5">
               <label className="text-zinc-400 font-bold uppercase tracking-wider text-[9px]">Quy trình hoạt động, làm việc từng bước *</label>
               <textarea
-                rows={6}
+                rows={5}
                 required
                 placeholder="Bước 1: Chọn gói chụp → Bước 2: Setup bối cảnh chụp → Bước 3: Hậu kỳ ảnh..."
                 value={workingProcess}

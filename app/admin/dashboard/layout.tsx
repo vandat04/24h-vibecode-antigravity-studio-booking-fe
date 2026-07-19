@@ -110,6 +110,14 @@ export default function AdminDashboardLayout({
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>reviews</span>
               <span>Đánh giá (Stories)</span>
             </Link>
+            <Link href="/admin/dashboard/core-values" className={getLinkClass("/admin/dashboard/core-values")}>
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>verified_user</span>
+              <span>Giá trị cốt lõi</span>
+            </Link>
+            <Link href="/admin/dashboard/work-process" className={getLinkClass("/admin/dashboard/work-process")}>
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>schema</span>
+              <span>Quy trình làm việc</span>
+            </Link>
             <Link href="/admin/dashboard/info" className={getLinkClass("/admin/dashboard/info")}>
               <span className="material-symbols-outlined" style={{ fontSize: 20 }}>info</span>
               <span>Thông tin Studio</span>

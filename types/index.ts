@@ -18,6 +18,8 @@ export interface StudioInfo {
   tiktokUrl?: string;
   introVideoUrl?: string;
   introduction?: string;
+  vision?: string;
+  mission?: string;
   workingProcess?: string;
   googleMapUrl?: string;
 }
@@ -123,6 +125,71 @@ export interface CustomerStory {
 }
 
 // ─── API 10: Schedule ─────────────────────────────────────────────
+export interface CoreValue {
+  id: number;
+  title: string;
+  description: string;
+  iconName: string;
+  sortOrder: number;
+  isDisplayed: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CoreValueRequest {
+  title: string;
+  description: string;
+  iconName?: string;
+  sortOrder?: number;
+  isDisplayed?: boolean;
+}
+
+// ─── API 14: Work Process & Phases ────────────────────────────────
+export interface ProcessStep {
+  id: number;
+  phaseId: number;
+  phaseCode?: string;
+  phaseName?: string;
+  stepNumber?: string;
+  title: string;
+  description: string;
+  iconName: string;
+  sortOrder: number;
+  isDisplayed: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ProcessPhase {
+  id: number;
+  phaseCode: string;
+  name: string;
+  description?: string;
+  sortOrder: number;
+  isDisplayed: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  steps: ProcessStep[];
+}
+
+export interface ProcessPhaseRequest {
+  phaseCode: string;
+  name: string;
+  description?: string;
+  sortOrder?: number;
+  isDisplayed?: boolean;
+}
+
+export interface ProcessStepRequest {
+  phaseId: number;
+  stepNumber?: string;
+  title: string;
+  description: string;
+  iconName?: string;
+  sortOrder?: number;
+  isDisplayed?: boolean;
+}
+
 export interface ScheduleResponse {
   date: string;
   bookedSlots: string[];     // ["09:00", "14:30"]
