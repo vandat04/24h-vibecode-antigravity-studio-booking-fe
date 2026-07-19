@@ -102,7 +102,7 @@ export default function CoreValuesSection() {
               </div>
 
               {/* Title */}
-              <h3 className="font-playfair text-xl md:text-2xl font-bold text-zinc-900 mb-4 leading-snug">
+              <h3 className="font-playfair text-base sm:text-lg md:text-lg lg:text-xl font-bold text-zinc-900 mb-4 leading-snug whitespace-nowrap">
                 {item.title}
               </h3>
 

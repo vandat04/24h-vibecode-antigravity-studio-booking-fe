@@ -102,7 +102,7 @@ export default function BrandStorySection() {
           {activeTab === "vision" && (
             <div className="space-y-4 animate-fade-in">
               <h3 className="font-playfair text-xl md:text-2xl text-zinc-950 mb-4 text-center font-bold">
-                Tầm Nhìn Định Hướng
+                Tầm Nhìn
               </h3>
               <div className="max-w-3xl mx-auto max-h-[500px] overflow-y-auto px-2 custom-scrollbar">
                 <p className="font-hanken text-base md:text-lg text-zinc-700 leading-relaxed text-justify whitespace-pre-line font-light">
@@ -116,7 +116,7 @@ export default function BrandStorySection() {
           {activeTab === "mission" && (
             <div className="space-y-4 animate-fade-in">
               <h3 className="font-playfair text-xl md:text-2xl text-zinc-950 mb-4 text-center font-bold">
-                Sứ Mệnh Cam Kết
+                Sứ Mệnh
               </h3>
               <div className="max-w-3xl mx-auto max-h-[500px] overflow-y-auto px-2 custom-scrollbar">
                 <p className="font-hanken text-base md:text-lg text-zinc-700 leading-relaxed text-justify whitespace-pre-line font-light">
