@@ -3,6 +3,7 @@ import Script from "next/script";
 import { ToastProvider } from "@/context/ToastContext";
 import "./globals.css";
 
+const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "GTM-PHVVRZC5";
 const gaId = process.env.NEXT_PUBLIC_GA_ID || "";
 const gscVerification = process.env.NEXT_PUBLIC_GSC_VERIFICATION || "";
 
@@ -45,7 +46,32 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-on-background antialiased">
-        {/* Google Analytics GA4 Script */}
+        {/* Google Tag Manager (noscript) */}
+        {gtmId && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
+        )}
+
+        {/* Google Tag Manager Script */}
+        {gtmId && (
+          <Script id="google-tag-manager" strategy="afterInteractive">
+            {`
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='gtm'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','${gtmId}');
+            `}
+          </Script>
+        )}
+
+        {/* Optional Direct Google Analytics GA4 Script */}
         {gaId && (
           <>
             <Script
