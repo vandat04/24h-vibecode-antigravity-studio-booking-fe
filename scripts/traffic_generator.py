@@ -3,19 +3,25 @@
 LEON STUDIO - Google Analytics 4 (GA4) Realtime Traffic Generator
 ====================================================================
 Hướng dẫn sử dụng:
-1. Mở file này và thay 'G-XXXXXXXXXX' bằng Mã đo lường GA4 thực tế của bạn.
-2. Mở terminal và chạy lệnh: python scripts/traffic_generator.py
-3. Mở trang analytics.google.com -> Mục Báo cáo -> Thời gian thực (Realtime)
+1. Mở terminal và chạy lệnh: python scripts/traffic_generator.py
+2. Mở trang analytics.google.com -> Mục Báo cáo -> Thời gian thực (Realtime)
    Bạn sẽ thấy lượng người dùng online nhảy liên tục 15-30 người!
 ====================================================================
 """
 
+import sys
 import time
 import random
 import urllib.request
 import urllib.parse
 
-# THAY MÃ GA4 CỦA BẠN VÀO ĐÂY (Ví dụ: G-ABC123XYZ)
+# Set console encoding to UTF-8 on Windows
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 GA_MEASUREMENT_ID = "G-XV55TX2K11"
 
 PAGES = [
@@ -57,21 +63,16 @@ def send_ga4_hit(measurement_id, client_id, page_url):
     try:
         req = urllib.request.Request(req_url, headers=headers)
         with urllib.request.urlopen(req) as response:
-            return response.status == 200 or response.status == 204
+            return response.status in (200, 204)
     except Exception as e:
         print(f"[!] Lỗi khi gửi hit: {e}")
         return False
 
 def main():
-    if GA_MEASUREMENT_ID == "G-XXXXXXXXXX":
-        print("[⚠️ WARNING] Bạn chưa nhập Mã GA4 thực tế vào biến GA_MEASUREMENT_ID trong script!")
-        print("Vui lòng mở file scripts/traffic_generator.py và sửa 'G-XXXXXXXXXX' thành mã thật của bạn.")
-        return
-
     print("===============================================================")
-    print(f"🚀 BẮT ĐẦU BƠM TRAFFIC CHO GA4 ({GA_MEASUREMENT_ID})...")
-    print("Mở trang https://analytics.google.com -> Realtime để xem kết quả!")
-    print("Nhấn Ctrl+C để dừng script bất cứ lúc nào.")
+    print(f"[+] BAT DAU BOM TRAFFIC CHO GA4 ({GA_MEASUREMENT_ID})...")
+    print("[+] Mo trang https://analytics.google.com -> Realtime de xem ket qua!")
+    print("[+] Nhan Ctrl+C de dung script bat cu luc nao.")
     print("===============================================================\n")
 
     client_pool = [f"{random.randint(100000000, 999999999)}.{random.randint(100000000, 999999999)}" for _ in range(35)]
@@ -87,10 +88,9 @@ def main():
             if success:
                 print(f"[{hit_count}] Sent pageview hit: {page_url} (Client: {client_id[:8]}...) -> OK")
             
-            # Delay ngẫu nhiên từ 1 đến 3 giây giữa các hit
-            time.sleep(random.uniform(1.0, 3.0))
+            time.sleep(random.uniform(1.0, 2.5))
     except KeyboardInterrupt:
-        print("\n[✓] Đã dừng bơm traffic.")
+        print("\n[+] Da dung bom traffic.")
 
 if __name__ == "__main__":
     main()
