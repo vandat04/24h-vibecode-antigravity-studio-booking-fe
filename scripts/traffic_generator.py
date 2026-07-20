@@ -16,7 +16,7 @@ import urllib.request
 import urllib.parse
 
 # THAY MÃ GA4 CỦA BẠN VÀO ĐÂY (Ví dụ: G-ABC123XYZ)
-GA_MEASUREMENT_ID = "G-XXXXXXXXXX"
+GA_MEASUREMENT_ID = "G-XV55TX2K11"
 
 PAGES = [
     "https://leonstudio.com.vn/",

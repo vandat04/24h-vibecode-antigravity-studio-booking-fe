@@ -4,7 +4,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import "./globals.css";
 
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "GTM-PHVVRZC5";
-const gaId = process.env.NEXT_PUBLIC_GA_ID || "";
+const gaId = process.env.NEXT_PUBLIC_GA_ID || "G-XV55TX2K11";
 const gscVerification = process.env.NEXT_PUBLIC_GSC_VERIFICATION || "";
 
 export const metadata: Metadata = {
