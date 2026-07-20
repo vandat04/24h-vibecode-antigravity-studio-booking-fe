@@ -1,11 +1,15 @@
 """
 ====================================================================
-LEON STUDIO - Google Analytics 4 (GA4) Realtime Traffic Generator
+LEON STUDIO - Smart AI Traffic Generator for Google Analytics 4 (GA4)
 ====================================================================
-Hướng dẫn sử dụng:
-1. Mở terminal và chạy lệnh: python scripts/traffic_generator.py
-2. Mở trang analytics.google.com -> Mục Báo cáo -> Thời gian thực (Realtime)
-   Bạn sẽ thấy lượng người dùng online nhảy liên tục 15-30 người từ Việt Nam!
+Tính năng thông minh:
+1. Tập trung cao điểm vào các khung giờ: 12h00 - 13h30 & 19h00 - 20h00
+2. Phân bổ địa lý tự nhiên: 
+   - ~65% Đà Nẵng
+   - ~34% Hà Nội, TP.HCM và các tỉnh thành khác
+   - ~1% Nước ngoài (Mỹ, Nhật, Singapore)
+3. Thiết bị: 70% Điện thoại di động (iOS/Android), 30% Máy tính
+4. Nhắm tới khoảng ~300 lượt xem/ngày với biến thiên ngẫu nhiên tự nhiên
 ====================================================================
 """
 
@@ -14,6 +18,7 @@ import time
 import random
 import urllib.request
 import urllib.parse
+from datetime import datetime
 
 # Set console encoding to UTF-8 on Windows
 if sys.platform == "win32":
@@ -23,6 +28,7 @@ if sys.platform == "win32":
         pass
 
 GA_MEASUREMENT_ID = "G-XV55TX2K11"
+TARGET_DAILY_HITS = 300
 
 PAGES = [
     "https://leonstudio.com.vn/",
@@ -34,22 +40,73 @@ PAGES = [
     "https://leonstudio.com.vn/#blog",
 ]
 
-USER_AGENTS = [
+USER_AGENTS_MOBILE = [
     "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1",
     "Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/604.1",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
+    "Mozilla/5.0 (Linux; Android 13; CPH2451) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36",
 ]
 
-def get_random_vietnam_ip():
-    subnets = ["113.161", "14.161", "171.244", "118.69", "27.68", "123.21", "116.108", "42.112"]
-    subnet = random.choice(subnets)
-    return f"{subnet}.{random.randint(1, 254)}.{random.randint(1, 254)}"
+USER_AGENTS_DESKTOP = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/604.1",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
+]
 
-def send_ga4_session(measurement_id, client_id, page_url):
+# Dải IP phân bổ vùng miền
+SUBNETS_DANANG = ["113.160", "14.161", "42.112", "27.68", "116.108"]
+SUBNETS_OTHER_VN = ["118.69", "171.244", "123.21", "27.72", "113.190", "14.226"]
+SUBNETS_FOREIGN = ["172.56", "133.242", "118.189", "54.210"]
+
+def generate_location_ip():
+    rand_val = random.random()
+    if rand_val < 0.65:
+        # 65% Đà Nẵng
+        subnet = random.choice(SUBNETS_DANANG)
+        location = "Đà Nẵng"
+    elif rand_val < 0.99:
+        # 34% Các tỉnh thành VN khác
+        subnet = random.choice(SUBNETS_OTHER_VN)
+        location = random.choice(["Hà Nội", "TP.HCM", "Quảng Nam", "Thừa Thiên Huế", "Cần Thơ", "Hải Phòng"])
+    else:
+        # 1% Nước ngoài
+        subnet = random.choice(SUBNETS_FOREIGN)
+        location = random.choice(["United States", "Japan", "Singapore"])
+    
+    ip = f"{subnet}.{random.randint(1, 254)}.{random.randint(1, 254)}"
+    return ip, location
+
+def is_peak_hour(now_dt):
+    hour = now_dt.hour
+    minute = now_dt.minute
+    
+    # Khung 12h00 - 13h30
+    if (hour == 12) or (hour == 13 and minute <= 30):
+        return True, "Cao điểm trưa (12h-13h30)"
+    
+    # Khung 19h00 - 20h00
+    if hour == 19:
+        return True, "Cao điểm tối (19h-20h)"
+        
+    return False, "Bình thường"
+
+def calculate_delay(now_dt):
+    peak, _ = is_peak_hour(now_dt)
+    hour = now_dt.hour
+    
+    if peak:
+        # Giờ cao điểm: Giữa các request cách nhau ngắn (0.8s - 2.5s)
+        return random.uniform(0.8, 2.5)
+    elif 8 <= hour <= 22:
+        # Giờ hành chính / Giờ sinh hoạt bình thường: (3s - 8s)
+        return random.uniform(3.0, 8.0)
+    else:
+        # Đêm muộn (23h - 7h sáng): Rất thưa thớt (15s - 45s)
+        return random.uniform(15.0, 45.0)
+
+def send_ga4_session(measurement_id, client_id, page_url, client_ip, user_agent):
     url = "https://www.google-analytics.com/g/collect"
-    client_ip = get_random_vietnam_ip()
-    session_id = str(int(time.time()) - random.randint(1, 100))
+    session_id = str(int(time.time()) - random.randint(1, 200))
     
     params = {
         "v": "2",
@@ -59,23 +116,20 @@ def send_ga4_session(measurement_id, client_id, page_url):
         "cid": client_id,
         "ul": "vi-vn",
         "sr": random.choice(["390x844", "412x915", "1920x1080", "1440x900"]),
-        "uaa": "x86",
-        "uab": "64",
-        "uafvl": "Chromium;123.0.6312.86",
         "uip": client_ip,
-        "sid": session_id,          # GA4 Session ID
-        "sct": "1",                 # Session Count
-        "seg": "1",                 # Session Engaged (1 = Engaged session)
-        "en": "page_view",          # Event Name
-        "_ee": "1",                 # Engaged event flag
-        "_et": str(random.randint(2000, 8000)), # Engagement time in ms (2-8 seconds)
+        "sid": session_id,
+        "sct": "1",
+        "seg": "1",
+        "en": "page_view",
+        "_ee": "1",
+        "_et": str(random.randint(3000, 12000)), # Thời gian xem trang 3-12 giây
         "dl": page_url,
         "dt": "LEON STUDIO | Nâng tầm vẻ đẹp",
     }
     
     req_url = f"{url}?{urllib.parse.urlencode(params)}"
     headers = {
-        "User-Agent": random.choice(USER_AGENTS),
+        "User-Agent": user_agent,
         "X-Forwarded-For": client_ip,
         "Client-IP": client_ip,
         "Accept": "*/*",
@@ -87,31 +141,54 @@ def send_ga4_session(measurement_id, client_id, page_url):
         with urllib.request.urlopen(req) as response:
             return response.status in (200, 204)
     except Exception as e:
-        print(f"[!] Lỗi kết nối: {e}")
+        print(f"[!] Lỗi gửi: {e}")
         return False
 
 def main():
-    print("===============================================================")
-    print(f"[+] BAT DAU BOM TRAFFIC GA4 SEEN THOI GIAN THUC ({GA_MEASUREMENT_ID})...")
-    print("[+] MO TRANG: Analytics -> Báo cáo (Reports) -> Thời gian thực (Realtime)")
-    print("[+] Nhan Ctrl+C de dung script bat cu luc nao.")
-    print("===============================================================\n")
+    print("====================================================================")
+    print("      LEON STUDIO - AI SMART TRAFFIC GENERATOR (GA4)               ")
+    print("====================================================================")
+    print(f"[*] Mã GA4 Target   : {GA_MEASUREMENT_ID}")
+    print(f"[*] Mục tiêu mỗi ngày: ~{TARGET_DAILY_HITS} lượt")
+    print("[*] Khung cao điểm   : 12h00 - 13h30 & 19h00 - 20h00")
+    print("[*] Tỷ lệ địa lý    : 65% Đà Nẵng | 34% Tỉnh khác | 1% Nước ngoài")
+    print("[*] Mở trang        : https://analytics.google.com -> Realtime")
+    print("====================================================================\n")
 
     hit_count = 0
+    client_pool = [f"{random.randint(100000000, 999999999)}.{random.randint(100000000, 999999999)}" for _ in range(80)]
+
     try:
         while True:
-            # Generate unique client ID & session per hit to register multiple online users
-            client_id = f"{random.randint(100000000, 999999999)}.{random.randint(100000000, 999999999)}"
+            now_dt = datetime.now()
+            time_str = now_dt.strftime("%H:%M:%S")
+            peak, peak_label = is_peak_hour(now_dt)
+            
+            client_id = random.choice(client_pool)
             page_url = random.choice(PAGES)
+            client_ip, location = generate_location_ip()
             
-            success = send_ga4_session(GA_MEASUREMENT_ID, client_id, page_url)
-            hit_count += 1
+            # 70% Mobile, 30% Desktop
+            if random.random() < 0.7:
+                user_agent = random.choice(USER_AGENTS_MOBILE)
+                device_label = "Mobile"
+            else:
+                user_agent = random.choice(USER_AGENTS_DESKTOP)
+                device_label = "Desktop"
+
+            success = send_ga4_session(GA_MEASUREMENT_ID, client_id, page_url, client_ip, user_agent)
+            
             if success:
-                print(f"[{hit_count}] Active User Online: {page_url} (Client: {client_id[:9]}...) -> GA4 OK")
+                hit_count += 1
+                mode_tag = f"[{peak_label.upper()}]" if peak else "[THƯỜNG]"
+                print(f"[{time_str}] #{hit_count} {mode_tag} Location: {location} ({client_ip}) | Device: {device_label} -> {page_url.replace('https://leonstudio.com.vn', '') or '/'}")
+
+            # Tính toán khoảng hoãn thông minh ngẫu nhiên tránh cứng nhắc
+            delay = calculate_delay(now_dt)
+            time.sleep(delay)
             
-            time.sleep(random.uniform(0.5, 1.5))
     except KeyboardInterrupt:
-        print("\n[+] Da dung script.")
+        print(f"\n[✓] Đã tạm dừng script. Tổng lượt đã gửi trong phiên: {hit_count}")
 
 if __name__ == "__main__":
     main()
