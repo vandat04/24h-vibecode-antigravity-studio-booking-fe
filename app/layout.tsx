@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { ToastProvider } from "@/context/ToastContext";
 import "./globals.css";
+
+const gaId = process.env.NEXT_PUBLIC_GA_ID || "";
+const gscVerification = process.env.NEXT_PUBLIC_GSC_VERIFICATION || "";
 
 export const metadata: Metadata = {
   title: "LEON STUDIO | Nâng tầm vẻ đẹp",
@@ -12,6 +16,13 @@ export const metadata: Metadata = {
     description: "Nhiếp ảnh chuyên nghiệp & trang điểm nghệ thuật",
     type: "website",
   },
+  ...(gscVerification
+    ? {
+        verification: {
+          google: gscVerification,
+        },
+      }
+    : {}),
 };
 
 export default function RootLayout({
@@ -34,9 +45,26 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-on-background antialiased">
+        {/* Google Analytics GA4 Script */}
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}');
+              `}
+            </Script>
+          </>
+        )}
+
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );
 }
-
