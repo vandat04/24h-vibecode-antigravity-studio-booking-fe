@@ -53,7 +53,6 @@ USER_AGENTS_DESKTOP = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0",
 ]
 
-# Dải IP phân bổ vùng miền
 SUBNETS_DANANG = ["113.160", "14.161", "42.112", "27.68", "116.108"]
 SUBNETS_OTHER_VN = ["118.69", "171.244", "123.21", "27.72", "113.190", "14.226"]
 SUBNETS_FOREIGN = ["172.56", "133.242", "118.189", "54.210"]
@@ -61,15 +60,12 @@ SUBNETS_FOREIGN = ["172.56", "133.242", "118.189", "54.210"]
 def generate_location_ip():
     rand_val = random.random()
     if rand_val < 0.65:
-        # 65% Đà Nẵng
         subnet = random.choice(SUBNETS_DANANG)
         location = "Đà Nẵng"
     elif rand_val < 0.99:
-        # 34% Các tỉnh thành VN khác
         subnet = random.choice(SUBNETS_OTHER_VN)
         location = random.choice(["Hà Nội", "TP.HCM", "Quảng Nam", "Thừa Thiên Huế", "Cần Thơ", "Hải Phòng"])
     else:
-        # 1% Nước ngoài
         subnet = random.choice(SUBNETS_FOREIGN)
         location = random.choice(["United States", "Japan", "Singapore"])
     
@@ -80,11 +76,9 @@ def is_peak_hour(now_dt):
     hour = now_dt.hour
     minute = now_dt.minute
     
-    # Khung 12h00 - 13h30
     if (hour == 12) or (hour == 13 and minute <= 30):
         return True, "Cao điểm trưa (12h-13h30)"
     
-    # Khung 19h00 - 20h00
     if hour == 19:
         return True, "Cao điểm tối (19h-20h)"
         
@@ -95,14 +89,11 @@ def calculate_delay(now_dt):
     hour = now_dt.hour
     
     if peak:
-        # Giờ cao điểm: Giữa các request cách nhau ngắn (0.8s - 2.5s)
-        return random.uniform(0.8, 2.5)
+        return random.uniform(0.5, 1.8)
     elif 8 <= hour <= 22:
-        # Giờ hành chính / Giờ sinh hoạt bình thường: (3s - 8s)
-        return random.uniform(3.0, 8.0)
+        return random.uniform(2.0, 5.0)
     else:
-        # Đêm muộn (23h - 7h sáng): Rất thưa thớt (15s - 45s)
-        return random.uniform(15.0, 45.0)
+        return random.uniform(10.0, 30.0)
 
 def send_ga4_session(measurement_id, client_id, page_url, client_ip, user_agent):
     url = "https://www.google-analytics.com/g/collect"
@@ -122,7 +113,7 @@ def send_ga4_session(measurement_id, client_id, page_url, client_ip, user_agent)
         "seg": "1",
         "en": "page_view",
         "_ee": "1",
-        "_et": str(random.randint(3000, 12000)), # Thời gian xem trang 3-12 giây
+        "_et": str(random.randint(3000, 12000)),
         "dl": page_url,
         "dt": "LEON STUDIO | Nâng tầm vẻ đẹp",
     }
@@ -145,21 +136,28 @@ def send_ga4_session(measurement_id, client_id, page_url, client_ip, user_agent)
         return False
 
 def main():
+    max_hits = None
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        max_hits = int(sys.argv[1])
+
     print("====================================================================")
     print("      LEON STUDIO - AI SMART TRAFFIC GENERATOR (GA4)               ")
     print("====================================================================")
     print(f"[*] Mã GA4 Target   : {GA_MEASUREMENT_ID}")
-    print(f"[*] Mục tiêu mỗi ngày: ~{TARGET_DAILY_HITS} lượt")
+    print(f"[*] Mục tiêu giới hạn: {max_hits if max_hits else 'Chạy liên tục (Vòng lặp)'}")
     print("[*] Khung cao điểm   : 12h00 - 13h30 & 19h00 - 20h00")
     print("[*] Tỷ lệ địa lý    : 65% Đà Nẵng | 34% Tỉnh khác | 1% Nước ngoài")
-    print("[*] Mở trang        : https://analytics.google.com -> Realtime")
     print("====================================================================\n")
 
     hit_count = 0
-    client_pool = [f"{random.randint(100000000, 999999999)}.{random.randint(100000000, 999999999)}" for _ in range(80)]
+    client_pool = [f"{random.randint(100000000, 999999999)}.{random.randint(100000000, 999999999)}" for _ in range(100)]
 
     try:
         while True:
+            if max_hits and hit_count >= max_hits:
+                print(f"\n[✓] Đã hoàn thành đợt bơm {hit_count}/{max_hits} lượt ngẫu nhiên.")
+                break
+
             now_dt = datetime.now()
             time_str = now_dt.strftime("%H:%M:%S")
             peak, peak_label = is_peak_hour(now_dt)
@@ -168,7 +166,6 @@ def main():
             page_url = random.choice(PAGES)
             client_ip, location = generate_location_ip()
             
-            # 70% Mobile, 30% Desktop
             if random.random() < 0.7:
                 user_agent = random.choice(USER_AGENTS_MOBILE)
                 device_label = "Mobile"
@@ -183,12 +180,11 @@ def main():
                 mode_tag = f"[{peak_label.upper()}]" if peak else "[THƯỜNG]"
                 print(f"[{time_str}] #{hit_count} {mode_tag} Location: {location} ({client_ip}) | Device: {device_label} -> {page_url.replace('https://leonstudio.com.vn', '') or '/'}")
 
-            # Tính toán khoảng hoãn thông minh ngẫu nhiên tránh cứng nhắc
             delay = calculate_delay(now_dt)
             time.sleep(delay)
             
     except KeyboardInterrupt:
-        print(f"\n[✓] Đã tạm dừng script. Tổng lượt đã gửi trong phiên: {hit_count}")
+        print(f"\n[✓] Đã dừng script. Tổng lượt đã gửi trong phiên: {hit_count}")
 
 if __name__ == "__main__":
     main()
