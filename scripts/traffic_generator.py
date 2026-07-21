@@ -127,8 +127,8 @@ def format_seconds(sec):
 
 def main():
     # Randomize session targets
-    target_hits = random.randint(150, 250)
-    target_duration_minutes = random.uniform(120.0, 150.0) # 2 tiếng đến 2.5 tiếng
+    target_hits = random.randint(130, 180)
+    target_duration_minutes = random.uniform(90.0, 120.0) # 1 tiếng 30 phút đến 2 tiếng
     target_duration_sec = target_duration_minutes * 60.0
 
     start_time = time.time()
@@ -138,8 +138,8 @@ def main():
     print("      LEON STUDIO - THỦ CÔNG TRAFFIC GENERATOR (GA4)               ")
     print("====================================================================")
     print(f"[*] Mã GA4 Target        : {GA_MEASUREMENT_ID}")
-    print(f"[*] Mục tiêu phiên ngẫu nhiên: {target_hits} lượt truy cập")
-    print(f"[*] Thời hạn chạy ngẫu nhiên : {target_duration_minutes:.1f} phút (đến {end_time_dt.strftime('%H:%M:%S')})")
+    print(f"[*] Mục tiêu phiên ngẫu nhiên: {target_hits} lượt truy cập (Khoảng 130 - 180 lượt)")
+    print(f"[*] Thời hạn chạy ngẫu nhiên : {target_duration_minutes:.1f} phút (~1h30m đến 2h, đến {end_time_dt.strftime('%H:%M:%S')})")
     print(f"[*] Phân bổ địa lý           : 70% Đà Nẵng | 29% VN khác | 1% Nước ngoài")
     print(f"[*] Điều kiện dừng           : Đạt đủ {target_hits} lượt HOẶC hết {target_duration_minutes:.1f} phút")
     print("====================================================================\n")
@@ -154,7 +154,7 @@ def main():
         while True:
             elapsed_sec = time.time() - start_time
             
-            # ĐIỀU KIỆN DỪNG 1: Vượt quá thời gian ngẫu nhiên (2h - 2.5h)
+            # ĐIỀU KIỆN DỪNG 1: Vượt quá thời gian ngẫu nhiên (1.5h - 2h)
             if elapsed_sec >= target_duration_sec:
                 print(f"\n[✓] HOÀN THÀNH: Đã hết thời hạn thời gian {format_seconds(elapsed_sec)} (Tối đa {target_duration_minutes:.1f} phút). Dừng script!")
                 break
